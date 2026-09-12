@@ -232,7 +232,7 @@ public class PlayerController : MonoBehaviour
         currentHP -= amount;
         invincibleUntil = Time.time + invincibilityDuration;
 
-        Debug.Log($"[Player] โดนดาเมจ {amount} -> เลือดเหลือ {Mathf.Max(currentHP, 0)}/{maxHP}"); 
+        Debug.Log($"[Player] โดนดาเมจ {amount} -> เลือดเหลือ {Mathf.Max(currentHP, 0)}/{maxHP}");
 
         if (currentHP <= 0)
         {
