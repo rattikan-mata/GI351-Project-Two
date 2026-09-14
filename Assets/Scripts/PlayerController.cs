@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 
@@ -46,9 +47,9 @@ public class PlayerController : MonoBehaviour
     public bool HasAmmo => currentAmmo > 0;
     #endregion
 
-    #region Health //ระบบเลือดของผู้เล่น
+    #region Health
     [Header("Health")]
-    [SerializeField] private int maxHP = 100;
+    [SerializeField] private int maxHP = 20;
     private int currentHP;
     public int CurrentHP => currentHP;
     public int MaxHP => maxHP;
@@ -59,7 +60,7 @@ public class PlayerController : MonoBehaviour
     private bool isDead = false;
     #endregion
 
-    #region Trade Items (เก็บของ 2 ชิ้น -> แลกที่ต้นไม้เพื่อเพิ่มเลือด)
+    #region Trade Items
     [Header("Trade Items")]
     [SerializeField] private int tradeItemCount = 0;
     public int TradeItemCount => tradeItemCount;
@@ -77,7 +78,7 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
-    #region Summon (เก็บไอเทมจากมอน -> กดใช้เรียกพระออกมาช่วยยิง)
+    #region Summon
     [Header("Summon")]
     [SerializeField] private KeyCode summonKey = KeyCode.Q;//ปุ่มกดใช้ไอเทม summon
 
@@ -109,6 +110,27 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
+    #region Melee Attack (ตีธรรมดาเเบบ Zomboid: ผลัก + สตันมอน)
+    [Header("Melee Attack")]
+    [SerializeField] private KeyCode meleeKey = KeyCode.Space; //ปุ่มตีธรรมดา (ปรับได้)
+    [SerializeField] private bool allowMouseAttack = true;     //เปิด/ปิดให้คลิกซ้ายตีได้ด้วย
+    [SerializeField] private float meleeRange = 1.2f;          //ระยะการตี
+    [SerializeField] private int meleeDamage = 10;             //ดาเมจการตี
+    [SerializeField] private float meleeCooldown = 0.5f;       //cooldown ระหว่างการตีแต่ละครั้ง
+    [SerializeField] private float meleeKnockbackForce = 6f;   //ระยะ/แรงที่มอนกระเดนจากการผลัก (ปรับได้)
+    [SerializeField] private float meleeStunDuration = 1.5f;   //เวลาสตันมอน (ปรับได้)
+    [SerializeField] private LayerMask monsterLayer;           //Layer ของมอนที่จะโดนตี
+
+    private float lastMeleeTime = -999f;
+    #endregion
+
+    #region Knockback
+    [Header("Knockback")]
+    [SerializeField] private float knockbackDuration = 0.2f; //เวลาที่ผู้เล่นถูกผลักก่อนคุมตัวเองได้อีกครั้ง
+
+    private bool isKnockedBack = false;
+    #endregion
+
     #region Unity Lifecycle
     private void Awake()
     {
@@ -128,15 +150,27 @@ public class PlayerController : MonoBehaviour
         if (isDead) return;
 
         ReadMovementInput();
-        UpdateFacingDirection();
+        UpdateFacingToMouse();
         HandleShootInput();
         HandleSummonInput();
+        HandleMeleeInput();
     }
 
     private void FixedUpdate()
     {
         if (isDead) return;
+        if (isKnockedBack) return; //กำลังโดนผลักกระเดนอยู่ -> ไม่รับ input การเดินปกติ
         rb.MovePosition(rb.position + currentVelocity * Time.fixedDeltaTime);
+    }
+
+    // วาดวงกลมระยะ Melee Attack ในหน้าต่าง Scene View
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Vector2 facing = Application.isPlaying ? GetFacingVector() : Vector2.down;
+        Vector2 center = (Vector2)transform.position + facing * (meleeRange * 0.5f);
+
+        Gizmos.DrawWireSphere(center, meleeRange);
     }
     #endregion
 
@@ -151,23 +185,31 @@ public class PlayerController : MonoBehaviour
         currentVelocity = moveInput.normalized * moveSpeed;
     }
 
-    private void UpdateFacingDirection()
+    private void UpdateFacingToMouse()
     {
-        if (moveInput == Vector2.zero) return; // ไม่ได้ขยับ -> คงทิศเดิมไว้ ไม่รีเซ็ต
+        if (Camera.main == null) return;
 
-        bool right = moveInput.x > 0f;
-        bool left = moveInput.x < 0f;
-        bool up = moveInput.y > 0f;
-        bool down = moveInput.y < 0f;
+        Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 dir = (Vector2)mouseWorld - (Vector2)transform.position;
 
-        if (up && right) CurrentFacing = FacingDirection.UpRight;
-        else if (up && left) CurrentFacing = FacingDirection.UpLeft;
-        else if (down && right) CurrentFacing = FacingDirection.DownRight;
-        else if (down && left) CurrentFacing = FacingDirection.DownLeft;
-        else if (up) CurrentFacing = FacingDirection.Up;
-        else if (down) CurrentFacing = FacingDirection.Down;
-        else if (left) CurrentFacing = FacingDirection.Left;
-        else if (right) CurrentFacing = FacingDirection.Right;
+        if (dir == Vector2.zero) return; //เมาส์ทับตัวผู้เล่นพอดี -> คงทิศเดิมไว้
+
+        //แปลงทิศเวกเตอร์เป็น 8 ทิศ (ทุกๆ 45 องศา)
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        if (angle < 0f) angle += 360f;
+
+        int sector = Mathf.RoundToInt(angle / 45f) % 8;
+        switch (sector)
+        {
+            case 0: CurrentFacing = FacingDirection.Right; break;
+            case 1: CurrentFacing = FacingDirection.UpRight; break;
+            case 2: CurrentFacing = FacingDirection.Up; break;
+            case 3: CurrentFacing = FacingDirection.UpLeft; break;
+            case 4: CurrentFacing = FacingDirection.Left; break;
+            case 5: CurrentFacing = FacingDirection.DownLeft; break;
+            case 6: CurrentFacing = FacingDirection.Down; break;
+            case 7: CurrentFacing = FacingDirection.DownRight; break;
+        }
 
         UpdateFirePointPosition();
     }
@@ -221,6 +263,59 @@ public class PlayerController : MonoBehaviour
     {
         currentAmmo += amount;
         Debug.Log($"[Player] เก็บกระสุน +{amount} -> มีกระสุนทั้งหมด {currentAmmo} นัด"); //debug ดูจำนวนกระสุนตอนเก็บ
+    }
+    #endregion
+
+    #region Melee Logic
+    //ตรวจปุ่มตี (Space หรือคลิกซ้าย) -> ตีมอนที่อยู่ในระยะด้านหน้า ผลักกระเดนเเละสตัน
+    private void HandleMeleeInput()
+    {
+        bool pressed = Input.GetKeyDown(meleeKey) || (allowMouseAttack && Input.GetMouseButtonDown(0));
+        if (!pressed) return;
+        if (Time.time - lastMeleeTime < meleeCooldown) return;
+
+        lastMeleeTime = Time.time;
+
+        Vector2 origin = (Vector2)transform.position + GetFacingVector() * (meleeRange * 0.5f);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(origin, meleeRange, monsterLayer);
+
+        foreach (var hit in hits)
+        {
+            if (hit.TryGetComponent<Monster>(out var monster))
+            {
+                monster.TakeDamage(meleeDamage);
+
+                Vector2 knockDir = ((Vector2)monster.transform.position - (Vector2)transform.position).normalized;
+                monster.ApplyKnockback(knockDir, meleeKnockbackForce);
+                monster.ApplyStun(meleeStunDuration);
+            }
+        }
+    }
+    #endregion
+
+    #region Knockback Logic
+    //ผู้เล่นโดนผลักกระเดน เรียกจาก Monster ตอนโดนตี
+    public void ApplyKnockback(Vector2 direction, float force)
+    {
+        if (isDead) return;
+        StopCoroutine(nameof(KnockbackRoutine));
+        StartCoroutine(KnockbackRoutine(direction.normalized * force));
+    }
+
+    private IEnumerator KnockbackRoutine(Vector2 knockbackVelocity)
+    {
+        isKnockedBack = true;
+        float elapsed = 0f;
+
+        while (elapsed < knockbackDuration)
+        {
+            float t = 1f - (elapsed / knockbackDuration); //ค่อยๆ ลดแรงลงจนหยุด
+            rb.MovePosition(rb.position + knockbackVelocity * t * Time.fixedDeltaTime);
+            elapsed += Time.fixedDeltaTime;
+            yield return new WaitForFixedUpdate();
+        }
+
+        isKnockedBack = false;
     }
     #endregion
 

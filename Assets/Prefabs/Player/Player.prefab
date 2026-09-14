@@ -29,14 +29,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1042247484374936918}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0.7131476, w: 0.701014}
+  m_LocalPosition: {x: -0.9910339, y: 0.1642203, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3456558452579545059}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90.983}
 --- !u!212 &4195069576502474560
 SpriteRenderer:
   serializedVersion: 3
@@ -86,7 +86,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
+  m_Sprite: {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -137,17 +137,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   moveSpeed: 4
-  fireKey: 32
+  fireKey: 257
   projectilePrefab: {fileID: 6632361736362759553, guid: 78715481cd2b6dd4b87871abb58d7c67, type: 3}
   firePoint: {fileID: 3456558452579545059}
-  firePointOffset: 0.5
+  firePointOffset: 0.56
   projectileSpeed: 8
   projectileDamage: 10
+  projectileRange: 10
   fireCooldown: 0.3
   currentAmmo: 0
-  maxHP: 100
+  maxHP: 20
   invincibilityDuration: 0.5
   tradeItemCount: 0
+  summonKey: 113
+  meleeKey: 32
+  allowMouseAttack: 1
+  meleeRange: 1
+  meleeDamage: 5
+  meleeCooldown: 0.5
+  meleeKnockbackForce: 6
+  meleeStunDuration: 1.5
+  monsterLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  knockbackDuration: 0.2
 --- !u!58 &844580792877806701
 CircleCollider2D:
   m_ObjectHideFlags: 0

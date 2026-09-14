@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -6,7 +7,7 @@ public class Monster : MonoBehaviour, IDamageable
 {
     #region Health
     [Header("Health")]
-    [SerializeField] protected int maxHP = 30;
+    [SerializeField] protected int maxHP = 10;
     protected int currentHP;
     public int CurrentHP => currentHP;
     public int MaxHP => maxHP;
@@ -33,6 +34,22 @@ public class Monster : MonoBehaviour, IDamageable
     private bool isFlashing = false;
     #endregion
 
+    #region Stun
+    [Header("Stun")]
+    [SerializeField] protected Color stunColor = Color.yellow; //สีตอนติดสตัน
+
+    protected bool isStunned = false;
+    protected float stunEndTime = 0f;
+    public bool IsStunned => isStunned;
+    #endregion
+
+    #region Knockback
+    [Header("Knockback")]
+    [SerializeField] protected float knockbackDuration = 0.15f; //เวลาที่ใช้ในการกระเดน
+
+    protected bool isKnockedBack = false;
+    #endregion
+
     #region Item Drop (Summon พระ)
     [Header("Item Drop")]
     [SerializeField, Range(0f, 1f)] protected float dropChance = 0.3f; //โอกาสดรอปไอเทม (0 = ไม่ดรอป, 1 = ดรอปทุกครั้ง)
@@ -43,6 +60,7 @@ public class Monster : MonoBehaviour, IDamageable
     [Header("Attack")]
     [SerializeField] protected int contactDamage = 10;   //ดาเมจตอนติดตัวผู้เล่น
     [SerializeField] protected float attackCooldown = 1f; //cooldown กันโดนดาเมจรัวตอนติดตัวผู้เล่นอยู่
+    [SerializeField] protected float attackKnockbackForce = 5f; //แรงผลักผู้เล่นตอนโดนมอนตี
 
     private float lastAttackTime = -999f;
     #endregion
@@ -50,6 +68,8 @@ public class Monster : MonoBehaviour, IDamageable
     #region Unity Lifecycle
     protected virtual void Awake()
     {
+        if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
+
         currentHP = maxHP;
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0f;
@@ -74,22 +94,37 @@ public class Monster : MonoBehaviour, IDamageable
 
     protected virtual void Update()
     {
+        //หมดเวลาสตัน -> คืนสีเดิม (แต่ถ้ายังติดแฟลชสีแดงอยู่ให้รอแฟลชจบก่อน)
+        if (isStunned && Time.time >= stunEndTime)
+        {
+            isStunned = false;
+            if (spriteRenderer != null && !isFlashing)
+            {
+                spriteRenderer.color = originalColor;
+            }
+        }
+
+        //ไม่ทับสีตอนที่ยังติดสตันอยู่ (ถ้ายังติดสตันอยู่ให้เปลี่ยนเป็นสีเหลืองแทนสีเดิม)
         if (isFlashing && Time.time >= flashUntil)
         {
             isFlashing = false;
-            if (spriteRenderer != null) spriteRenderer.color = originalColor;
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = isStunned ? stunColor : originalColor;
+            }
         }
     }
 
     protected virtual void FixedUpdate()
     {
         if (isDead || playerTransform == null) return;
+        if (isStunned || isKnockedBack) return; //ติดสตันหรือกำลังกระเดน -> ไม่เดินไล่
         ChasePlayerIfInRange();
     }
 
     private void OnTriggerStay2D(Collider2D other)
     {
-        if (isDead) return;
+        if (isDead || isStunned) return; //ติดสตัน -> ตีผู้เล่นไม่ได้
         if (Time.time - lastAttackTime < attackCooldown) return;
 
         if (DamagePlayerOnContact(other, contactDamage))
@@ -127,9 +162,54 @@ public class Monster : MonoBehaviour, IDamageable
     protected void PlayHitFlash()
     {
         if (spriteRenderer == null) return;
-        spriteRenderer.color = Color.red;
+
+        // ถ้าไม่ติดสตันค่อยเปลี่ยนเป็นสีแดง (กันทับสีเหลืองตอนสตัน)
+        if (!isStunned)
+        {
+            spriteRenderer.color = Color.red;
+        }
+
         flashUntil = Time.time + hitFlashDuration;
         isFlashing = true;
+    }
+    #endregion
+
+    #region Stun Logic
+    //ทำให้มอนติดสตัน (เดิน/ตีไม่ได้) เเละเปลี่ยนสีเป็นสีเหลือง เรียกจากการตีธรรมดาของผู้เล่น
+    public void ApplyStun(float duration)
+    {
+        if (isDead) return;
+
+        isStunned = true;
+        stunEndTime = Time.time + duration;
+
+        if (spriteRenderer != null) spriteRenderer.color = stunColor;
+    }
+    #endregion
+
+    #region Knockback Logic
+    //ผลักมอนกระเดนออกไปตามทิศทางที่กำหนด เรียกจากการตีธรรมดาของผู้เล่น
+    public void ApplyKnockback(Vector2 direction, float force)
+    {
+        if (isDead) return;
+        StopCoroutine(nameof(KnockbackRoutine));
+        StartCoroutine(KnockbackRoutine(direction.normalized * force));
+    }
+
+    private IEnumerator KnockbackRoutine(Vector2 knockbackVelocity)
+    {
+        isKnockedBack = true;
+        float elapsed = 0f;
+
+        while (elapsed < knockbackDuration)
+        {
+            float t = 1f - (elapsed / knockbackDuration); //ค่อยๆ ลดแรงลงจนหยุด
+            rb.MovePosition(rb.position + knockbackVelocity * t * Time.fixedDeltaTime);
+            elapsed += Time.fixedDeltaTime;
+            yield return new WaitForFixedUpdate();
+        }
+
+        isKnockedBack = false;
     }
     #endregion
 
@@ -171,12 +251,16 @@ public class Monster : MonoBehaviour, IDamageable
     #endregion
 
     #region Player Contact Helper
-    //ตัวเช็คว่าชนผู้เล่นไหม ถ้าใช่ก็เรียก TakeDamage ของ PlayerController
+    //ตัวเช็คว่าชนผู้เล่นไหม ถ้าใช่ก็เรียก TakeDamage เเละผลักผู้เล่นกระเดน
     protected bool DamagePlayerOnContact(Collider2D collision, int damage)
     {
         if (collision.CompareTag("Player") && collision.TryGetComponent<PlayerController>(out var player))
         {
             player.TakeDamage(damage);
+
+            Vector2 knockDir = ((Vector2)player.transform.position - (Vector2)transform.position).normalized;
+            player.ApplyKnockback(knockDir, attackKnockbackForce);
+
             return true;
         }
         return false;
