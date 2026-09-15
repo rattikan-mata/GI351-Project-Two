@@ -65,6 +65,21 @@ public class Monster : MonoBehaviour, IDamageable
     private float lastAttackTime = -999f;
     #endregion
 
+    #region Dash Attack Settings
+    [Header("Dash Attack")]
+    [SerializeField] protected float dashAttackRange = 3f; // ระยะห่างที่จะเริ่มหยุดนิ่งเพื่อเตรียมพุ่งชน
+    [SerializeField] protected float dashSpeed = 12f; // ความเร็วตอนพุ่งตัว
+    [SerializeField] protected float dashDuration = 0.25f; // เวลาที่ใช้ในการพุ่ง (ยิ่งน้อยยิ่งพุ่งสั้น)
+    [SerializeField] protected float dashRecoveryTime = 1.5f; // เวลาที่มอนสเตอร์จะยืนชะงักหลังพุ่งเสร็จก่อนเดินต่อ
+
+    [Header("Dash Warning (Telegraph)")]
+    [SerializeField] protected Color warningColor = Color.cyan; // สีที่ต้องการให้กระพริบเตือน
+    [SerializeField] protected float warningDuration = 0.6f; // ระยะเวลากระพริบเตือนก่อนพุ่ง
+    [SerializeField] protected float blinkInterval = 0.1f; // ความเร็วในการสลับสีกระพริบ
+
+    protected bool isAttacking = false; // เช็คว่ามอนสเตอร์กำลังอยู่ในลูปการโจมตีหรือไม่
+    #endregion
+
     #region Unity Lifecycle
     protected virtual void Awake()
     {
@@ -118,8 +133,22 @@ public class Monster : MonoBehaviour, IDamageable
     protected virtual void FixedUpdate()
     {
         if (isDead || playerTransform == null) return;
-        if (isStunned || isKnockedBack) return; //ติดสตันหรือกำลังกระเดน -> ไม่เดินไล่
-        ChasePlayerIfInRange();
+
+        // เพิ่มเงื่อนไข isAttacking เพื่อไม่ให้มอนสเตอร์เดินไล่ปกติเวลากำลังเตรียมพุ่งหรือพุ่งอยู่
+        if (isStunned || isKnockedBack || isAttacking) return;
+
+        // ตรวจสอบระยะห่างระหว่างมอนสเตอร์และผู้เล่น
+        float distance = Vector2.Distance(transform.position, playerTransform.position);
+
+        if (distance <= dashAttackRange)
+        {
+            // ถ้าเข้ามาในระยะ ให้เริ่มกระบวนการชาร์จโจมตี
+            StartCoroutine(DashAttackRoutine());
+        }
+        else
+        {
+            ChasePlayerIfInRange();
+        }
     }
 
     private void OnTriggerStay2D(Collider2D other)
@@ -264,6 +293,66 @@ public class Monster : MonoBehaviour, IDamageable
             return true;
         }
         return false;
+    }
+    #endregion
+
+    #region Dash Attack Logic
+    protected virtual IEnumerator DashAttackRoutine()
+    {
+        isAttacking = true; // ล็อคสถานะไว้ไม่ให้ FixedUpdate() สั่งเดินปกติ
+
+        // --- เฟสที่ 1: หยุดยืนและกระพริบเตือน (Telegraph) ---
+        float elapsed = 0f;
+        bool toggleColor = false;
+
+        while (elapsed < warningDuration)
+        {
+            // เช็คว่าไม่ได้ติดสถานะโดนผู้เล่นตี (ตีธรรมดาสตันหรือกระพริบแดง) ค่อยแสดงสีเตือน
+            if (!isStunned && !isFlashing && spriteRenderer != null)
+            {
+                spriteRenderer.color = toggleColor ? warningColor : originalColor;
+            }
+            toggleColor = !toggleColor;
+
+            float waitTime = Mathf.Min(blinkInterval, warningDuration - elapsed);
+            yield return new WaitForSeconds(waitTime);
+            elapsed += waitTime;
+        }
+
+        // คืนสีเดิมก่อนเริ่มพุ่ง
+        if (!isStunned && !isFlashing && spriteRenderer != null)
+        {
+            spriteRenderer.color = originalColor;
+        }
+
+        // --- เฟสที่ 2: ล็อคเป้าแล้วพุ่งชน (Dash) ---
+        // เช็คอีกครั้งเผื่อตายหรือโดนสตันระหว่างกระพริบเตือน
+        if (playerTransform != null && !isDead && !isStunned)
+        {
+            // ล็อคทิศทางไปยังตำแหน่งปัจจุบันของผู้เล่น
+            Vector2 dashDirection = ((Vector2)playerTransform.position - rb.position).normalized;
+            float dashTime = 0f;
+
+            while (dashTime < dashDuration)
+            {
+                // ถ้าโดนสตันหรือตายตอนกำลังพุ่ง ให้หยุดพุ่งทันที
+                if (isDead || isStunned) break;
+
+                // เคลื่อนที่ไปข้างหน้าอย่างรวดเร็ว
+                rb.MovePosition(rb.position + dashDirection * dashSpeed * Time.fixedDeltaTime);
+                dashTime += Time.fixedDeltaTime;
+                yield return new WaitForFixedUpdate();
+            }
+        }
+
+        // --- เฟสที่ 3: ชะงักเพื่อพักหลังพุ่ง (Recovery) ---
+        if (!isDead)
+        {
+            yield return new WaitForSeconds(dashRecoveryTime);
+        }
+
+        // ปลดล็อคสถานะ มอนสเตอร์จะกลับไปเช็คการเดินต่อใน FixedUpdate()
+        isAttacking = false;
     }
     #endregion
 }

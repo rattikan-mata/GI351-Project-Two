@@ -169,6 +169,13 @@ MonoBehaviour:
   contactDamage: 5
   attackCooldown: 1
   attackKnockbackForce: 5
+  dashAttackRange: 2
+  dashSpeed: 12
+  dashDuration: 0.25
+  dashRecoveryTime: 1.5
+  warningColor: {r: 1, g: 0, b: 0.08972883, a: 1}
+  warningDuration: 1
+  blinkInterval: 0.2
 --- !u!50 &6023943045422194060
 Rigidbody2D:
   serializedVersion: 5
