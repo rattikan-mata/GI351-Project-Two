@@ -17,8 +17,8 @@ public class Monster : MonoBehaviour, IDamageable
     #region Movement / Chase AI
     [Header("Movement / Chase AI")]
     [SerializeField] protected float moveSpeed = 2f;
-    [SerializeField] protected float detectionRange = 5f;   // ระยะมองเห็นผู้เล่น ถ้าอยู่ในระยะนี้จะเดินเข้าหา
-    [SerializeField] protected float stoppingDistance = 0.6f; // ระยะห่างที่มอนหยุดกันทะลุตัว player
+    [SerializeField] protected float detectionRange = 5f;
+    [SerializeField] protected float stoppingDistance = 0.6f;
 
     protected Rigidbody2D rb;
     protected Transform playerTransform;
@@ -27,7 +27,7 @@ public class Monster : MonoBehaviour, IDamageable
     #region Hit Feedback (Optional Flash)
     [Header("Hit Feedback (Optional)")]
     [SerializeField] protected SpriteRenderer spriteRenderer;
-    [SerializeField] protected float hitFlashDuration = 0.1f; //มอนตัวเเฟลชเวลาโดนตีเผื่อไว้เป็น juice
+    [SerializeField] protected float hitFlashDuration = 0.1f;
 
     private Color originalColor;
     private float flashUntil = 0f;
@@ -35,8 +35,9 @@ public class Monster : MonoBehaviour, IDamageable
     #endregion
 
     #region Stun
-    [Header("Stun")]
-    [SerializeField] protected Color stunColor = Color.yellow; //สีตอนติดสตัน
+    [Header("Stun Settings")]
+    [SerializeField] protected Color stunColor = Color.yellow;
+    [SerializeField] protected float stunDuration = 1.5f;
 
     protected bool isStunned = false;
     protected float stunEndTime = 0f;
@@ -45,40 +46,40 @@ public class Monster : MonoBehaviour, IDamageable
 
     #region Knockback
     [Header("Knockback")]
-    [SerializeField] protected float knockbackDuration = 0.15f; //เวลาที่ใช้ในการกระเดน
+    [SerializeField] protected float knockbackDuration = 0.15f;
 
     protected bool isKnockedBack = false;
     #endregion
 
     #region Item Drop (Summon พระ)
     [Header("Item Drop")]
-    [SerializeField, Range(0f, 1f)] protected float dropChance = 0.3f; //โอกาสดรอปไอเทม (0 = ไม่ดรอป, 1 = ดรอปทุกครั้ง)
+    [SerializeField, Range(0f, 1f)] protected float dropChance = 0.3f;
     [SerializeField] protected GameObject dropItemPrefab;
     #endregion
 
     #region Attack (Contact Damage)
     [Header("Attack")]
-    [SerializeField] protected int contactDamage = 10;   //ดาเมจตอนติดตัวผู้เล่น
-    [SerializeField] protected float attackCooldown = 1f; //cooldown กันโดนดาเมจรัวตอนติดตัวผู้เล่นอยู่
-    [SerializeField] protected float attackKnockbackForce = 5f; //แรงผลักผู้เล่นตอนโดนมอนตี
+    [SerializeField] protected int contactDamage = 10;
+    [SerializeField] protected float attackCooldown = 1f;
+    [SerializeField] protected float attackKnockbackForce = 5f;
 
     private float lastAttackTime = -999f;
     #endregion
 
     #region Dash Attack Settings
     [Header("Dash Attack")]
-    [SerializeField] protected float dashAttackRange = 3f; // ระยะห่างที่จะเริ่มหยุดนิ่งเพื่อเตรียมพุ่งชน
-    [SerializeField] protected float dashSpeed = 12f; // ความเร็วตอนพุ่งตัว
-    [SerializeField] protected float dashDuration = 0.25f; // เวลาที่ใช้ในการพุ่ง (ยิ่งน้อยยิ่งพุ่งสั้น)
-    [SerializeField] protected float dashRecoveryTime = 1.5f; // เวลาที่มอนสเตอร์จะยืนชะงักหลังพุ่งเสร็จก่อนเดินต่อ
+    [SerializeField] protected float dashAttackRange = 3f;
+    [SerializeField] protected float dashSpeed = 12f;
+    [SerializeField] protected float dashDuration = 0.25f;
+    [SerializeField] protected float dashRecoveryTime = 1.5f;
 
     [Header("Dash Warning (Telegraph)")]
-    [SerializeField] protected Color warningColor = Color.cyan; // สีที่ต้องการให้กระพริบเตือน
-    [SerializeField] protected float warningDuration = 0.6f; // ระยะเวลากระพริบเตือนก่อนพุ่ง
-    [SerializeField] protected float blinkInterval = 0.1f; // ความเร็วในการสลับสีกระพริบ
+    [SerializeField] protected Color warningColor = Color.cyan;
+    [SerializeField] protected float warningDuration = 0.6f;
+    [SerializeField] protected float blinkInterval = 0.1f;
 
-    protected bool isAttacking = false; // เช็คว่ามอนสเตอร์กำลังอยู่ในลูปการโจมตีหรือไม่
-    protected bool isDashing = false; // <--- เพิ่มตัวแปรเช็คสถานะพุ่งตรงนี้
+    protected bool isAttacking = false;
+    protected bool isDashing = false;
     #endregion
 
     #region Unity Lifecycle
@@ -91,8 +92,6 @@ public class Monster : MonoBehaviour, IDamageable
         rb.gravityScale = 0f;
         rb.freezeRotation = true;
 
-        GetComponent<Collider2D>().isTrigger = true;
-
         if (spriteRenderer != null)
         {
             originalColor = spriteRenderer.color;
@@ -101,7 +100,6 @@ public class Monster : MonoBehaviour, IDamageable
 
     protected virtual void Start()
     {
-        // เก็บ reference ผู้เล่นไว้ล่วงหน้า กันเรียก PlayerController.Instance ทุกเฟรมโดยไม่จำเป็น
         if (PlayerController.Instance != null)
         {
             playerTransform = PlayerController.Instance.transform;
@@ -110,7 +108,6 @@ public class Monster : MonoBehaviour, IDamageable
 
     protected virtual void Update()
     {
-        //หมดเวลาสตัน -> คืนสีเดิม (แต่ถ้ายังติดแฟลชสีแดงอยู่ให้รอแฟลชจบก่อน)
         if (isStunned && Time.time >= stunEndTime)
         {
             isStunned = false;
@@ -120,7 +117,6 @@ public class Monster : MonoBehaviour, IDamageable
             }
         }
 
-        //ไม่ทับสีตอนที่ยังติดสตันอยู่ (ถ้ายังติดสตันอยู่ให้เปลี่ยนเป็นสีเหลืองแทนสีเดิม)
         if (isFlashing && Time.time >= flashUntil)
         {
             isFlashing = false;
@@ -135,15 +131,26 @@ public class Monster : MonoBehaviour, IDamageable
     {
         if (isDead || playerTransform == null) return;
 
-        // เพิ่มเงื่อนไข isAttacking เพื่อไม่ให้มอนสเตอร์เดินไล่ปกติเวลากำลังเตรียมพุ่งหรือพุ่งอยู่
-        if (isStunned || isKnockedBack || isAttacking) return;
+        // Knockback and the actual dash movement drive rb.linearVelocity themselves
+        // from their coroutines. If we zero the velocity here too, we run BEFORE the
+        // physics step every fixed frame and stomp whatever the coroutine just set,
+        // so the monster never actually moves (it only visually flashes/telegraphs).
+        if (isKnockedBack || isDashing)
+        {
+            return;
+        }
 
-        // ตรวจสอบระยะห่างระหว่างมอนสเตอร์และผู้เล่น
+        // Stunned (and not being knocked back) or mid-telegraph/recovery: hold still.
+        if (isStunned || isAttacking)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
+
         float distance = Vector2.Distance(transform.position, playerTransform.position);
 
         if (distance <= dashAttackRange)
         {
-            // ถ้าเข้ามาในระยะ ให้เริ่มกระบวนการชาร์จโจมตี
             StartCoroutine(DashAttackRoutine());
         }
         else
@@ -152,9 +159,8 @@ public class Monster : MonoBehaviour, IDamageable
         }
     }
 
-    private void OnTriggerStay2D(Collider2D other)
+    private void OnCollisionStay2D(Collision2D other)
     {
-        // <--- ดักไว้ตรงนี้: ถ้าไม่ได้พุ่ง หรือตาย หรือติดสตัน -> ห้ามทำดาเมจ! --->
         if (!isDashing || isDead || isStunned) return;
 
         if (Time.time - lastAttackTime < attackCooldown) return;
@@ -167,7 +173,6 @@ public class Monster : MonoBehaviour, IDamageable
 
     private void OnDrawGizmosSelected()
     {
-        // วาดวงกลมระยะมองเห็นใน Scene View เวลาเลือกมอนตัวนี้ ช่วยจูนค่าง่ายขึ้น
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
 
@@ -184,9 +189,12 @@ public class Monster : MonoBehaviour, IDamageable
         if (distance <= detectionRange && distance > stoppingDistance)
         {
             Vector2 direction = ((Vector2)playerTransform.position - rb.position).normalized;
-            rb.MovePosition(rb.position + direction * moveSpeed * Time.fixedDeltaTime);
+            rb.linearVelocity = direction * moveSpeed;
         }
-        // อยู่นอกระยะมองเห็น หรือใกล้ผู้เล่นจนถึง stoppingDistance แล้ว -> ไม่ขยับ (ยืนเฉย)
+        else
+        {
+            rb.linearVelocity = Vector2.zero;
+        }
     }
     #endregion
 
@@ -195,7 +203,6 @@ public class Monster : MonoBehaviour, IDamageable
     {
         if (spriteRenderer == null) return;
 
-        // ถ้าไม่ติดสตันค่อยเปลี่ยนเป็นสีแดง (กันทับสีเหลืองตอนสตัน)
         if (!isStunned)
         {
             spriteRenderer.color = Color.red;
@@ -207,7 +214,6 @@ public class Monster : MonoBehaviour, IDamageable
     #endregion
 
     #region Stun Logic
-    //ทำให้มอนติดสตัน (เดิน/ตีไม่ได้) เเละเปลี่ยนสีเป็นสีเหลือง เรียกจากการตีธรรมดาของผู้เล่น
     public void ApplyStun(float duration)
     {
         if (isDead) return;
@@ -217,10 +223,11 @@ public class Monster : MonoBehaviour, IDamageable
 
         if (spriteRenderer != null) spriteRenderer.color = stunColor;
     }
+
+    public float GetStunDuration() => stunDuration;
     #endregion
 
     #region Knockback Logic
-    //ผลักมอนกระเดนออกไปตามทิศทางที่กำหนด เรียกจากการตีธรรมดาของผู้เล่น
     public void ApplyKnockback(Vector2 direction, float force)
     {
         if (isDead) return;
@@ -235,12 +242,13 @@ public class Monster : MonoBehaviour, IDamageable
 
         while (elapsed < knockbackDuration)
         {
-            float t = 1f - (elapsed / knockbackDuration); //ค่อยๆ ลดแรงลงจนหยุด
-            rb.MovePosition(rb.position + knockbackVelocity * t * Time.fixedDeltaTime);
+            float t = 1f - (elapsed / knockbackDuration);
+            rb.linearVelocity = knockbackVelocity * t;
             elapsed += Time.fixedDeltaTime;
             yield return new WaitForFixedUpdate();
         }
 
+        rb.linearVelocity = Vector2.zero;
         isKnockedBack = false;
     }
     #endregion
@@ -283,10 +291,9 @@ public class Monster : MonoBehaviour, IDamageable
     #endregion
 
     #region Player Contact Helper
-    //ตัวเช็คว่าชนผู้เล่นไหม ถ้าใช่ก็เรียก TakeDamage เเละผลักผู้เล่นกระเดน
-    protected bool DamagePlayerOnContact(Collider2D collision, int damage)
+    protected bool DamagePlayerOnContact(Collision2D collision, int damage)
     {
-        if (collision.CompareTag("Player") && collision.TryGetComponent<PlayerController>(out var player))
+        if (collision.gameObject.CompareTag("Player") && collision.gameObject.TryGetComponent<PlayerController>(out var player))
         {
             player.TakeDamage(damage);
 
@@ -302,15 +309,13 @@ public class Monster : MonoBehaviour, IDamageable
     #region Dash Attack Logic
     protected virtual IEnumerator DashAttackRoutine()
     {
-        isAttacking = true; // ล็อคสถานะไว้ไม่ให้ FixedUpdate() สั่งเดินปกติ
+        isAttacking = true;
 
-        // --- เฟสที่ 1: หยุดยืนและกระพริบเตือน (Telegraph) ---
         float elapsed = 0f;
         bool toggleColor = false;
 
         while (elapsed < warningDuration)
         {
-            // เช็คว่าไม่ได้ติดสถานะโดนผู้เล่นตี (ตีธรรมดาสตันหรือกระพริบแดง) ค่อยแสดงสีเตือน
             if (!isStunned && !isFlashing && spriteRenderer != null)
             {
                 spriteRenderer.color = toggleColor ? warningColor : originalColor;
@@ -322,43 +327,36 @@ public class Monster : MonoBehaviour, IDamageable
             elapsed += waitTime;
         }
 
-        // คืนสีเดิมก่อนเริ่มพุ่ง
         if (!isStunned && !isFlashing && spriteRenderer != null)
         {
             spriteRenderer.color = originalColor;
         }
 
-        // --- เฟสที่ 2: ล็อคเป้าแล้วพุ่งชน (Dash) ---
-        // เช็คอีกครั้งเผื่อตายหรือโดนสตันระหว่างกระพริบเตือน
         if (playerTransform != null && !isDead && !isStunned)
         {
-            // ล็อคทิศทางไปยังตำแหน่งปัจจุบันของผู้เล่น
             Vector2 dashDirection = ((Vector2)playerTransform.position - rb.position).normalized;
             float dashTime = 0f;
 
-            isDashing = true; // <--- เปิดสถานะว่ากำลังพุ่งชน (อนุญาตให้ทำดาเมจได้)
-
+            isDashing = true;
             while (dashTime < dashDuration)
             {
-                // ถ้าโดนสตันหรือตายตอนกำลังพุ่ง ให้หยุดพุ่งทันที
                 if (isDead || isStunned) break;
 
-                // เคลื่อนที่ไปข้างหน้าอย่างรวดเร็ว
-                rb.MovePosition(rb.position + dashDirection * dashSpeed * Time.fixedDeltaTime);
+                rb.linearVelocity = dashDirection * dashSpeed;
                 dashTime += Time.fixedDeltaTime;
                 yield return new WaitForFixedUpdate();
             }
 
-            isDashing = false; // <--- ปิดสถานะหลังพุ่งชนเสร็จ
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+            isDashing = false;
         }
 
-        // --- เฟสที่ 3: ชะงักเพื่อพักหลังพุ่ง (Recovery) ---
         if (!isDead)
         {
             yield return new WaitForSeconds(dashRecoveryTime);
         }
 
-        // ปลดล็อคสถานะ มอนสเตอร์จะกลับไปเช็คการเดินต่อใน FixedUpdate()
         isAttacking = false;
     }
     #endregion
