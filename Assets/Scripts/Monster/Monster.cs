@@ -78,6 +78,7 @@ public class Monster : MonoBehaviour, IDamageable
     [SerializeField] protected float blinkInterval = 0.1f; // ความเร็วในการสลับสีกระพริบ
 
     protected bool isAttacking = false; // เช็คว่ามอนสเตอร์กำลังอยู่ในลูปการโจมตีหรือไม่
+    protected bool isDashing = false; // <--- เพิ่มตัวแปรเช็คสถานะพุ่งตรงนี้
     #endregion
 
     #region Unity Lifecycle
@@ -153,7 +154,9 @@ public class Monster : MonoBehaviour, IDamageable
 
     private void OnTriggerStay2D(Collider2D other)
     {
-        if (isDead || isStunned) return; //ติดสตัน -> ตีผู้เล่นไม่ได้
+        // <--- ดักไว้ตรงนี้: ถ้าไม่ได้พุ่ง หรือตาย หรือติดสตัน -> ห้ามทำดาเมจ! --->
+        if (!isDashing || isDead || isStunned) return;
+
         if (Time.time - lastAttackTime < attackCooldown) return;
 
         if (DamagePlayerOnContact(other, contactDamage))
@@ -333,6 +336,8 @@ public class Monster : MonoBehaviour, IDamageable
             Vector2 dashDirection = ((Vector2)playerTransform.position - rb.position).normalized;
             float dashTime = 0f;
 
+            isDashing = true; // <--- เปิดสถานะว่ากำลังพุ่งชน (อนุญาตให้ทำดาเมจได้)
+
             while (dashTime < dashDuration)
             {
                 // ถ้าโดนสตันหรือตายตอนกำลังพุ่ง ให้หยุดพุ่งทันที
@@ -343,6 +348,8 @@ public class Monster : MonoBehaviour, IDamageable
                 dashTime += Time.fixedDeltaTime;
                 yield return new WaitForFixedUpdate();
             }
+
+            isDashing = false; // <--- ปิดสถานะหลังพุ่งชนเสร็จ
         }
 
         // --- เฟสที่ 3: ชะงักเพื่อพักหลังพุ่ง (Recovery) ---
