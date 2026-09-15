@@ -157,7 +157,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Monster
   maxHP: 20
-  moveSpeed: 0.99
+  moveSpeed: 1.2
   detectionRange: 5
   stoppingDistance: 0.6
   spriteRenderer: {fileID: 0}

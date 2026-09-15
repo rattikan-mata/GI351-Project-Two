@@ -136,7 +136,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 522326bab0eeac044ac4fdb929570b90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  moveSpeed: 4
+  moveSpeed: 3
   fireKey: 257
   projectilePrefab: {fileID: 6632361736362759553, guid: 78715481cd2b6dd4b87871abb58d7c67, type: 3}
   firePoint: {fileID: 3456558452579545059}
