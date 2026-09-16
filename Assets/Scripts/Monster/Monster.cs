@@ -92,6 +92,13 @@ public class Monster : MonoBehaviour, IDamageable
         rb.gravityScale = 0f;
         rb.freezeRotation = true;
 
+        // สำคัญ: ถ้า Rigidbody2D ของมอน/ผู้เล่นเป็น Kinematic ทั้งคู่ (ปกติของเกมที่คุมการเดินเองด้วย MovePosition)
+        // Unity จะไม่ยิง OnCollisionEnter/Stay2D ให้เลยถ้าไม่เปิดตัวนี้ไว้ -> เป็นสาเหตุหลักที่ดาเมจ/HP ไม่ลด
+        rb.useFullKinematicContacts = true;
+
+        // ป้องกันมอนวิ่งพุ่ง (dash) เร็วจนทะลุผ่านผู้เล่นในเฟรมเดียวโดยไม่เกิดการชน (tunneling)
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+
         if (spriteRenderer != null)
         {
             originalColor = spriteRenderer.color;
@@ -159,8 +166,26 @@ public class Monster : MonoBehaviour, IDamageable
         }
     }
 
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        HandleContactDamage(other);
+    }
+
     private void OnCollisionStay2D(Collision2D other)
     {
+        HandleContactDamage(other);
+    }
+
+    /// <summary>
+    /// ใช้ร่วมกันทั้ง Enter และ Stay เพราะการพุ่งชน (dash) เร็วมาก
+    /// บางทีสัมผัสกันแค่เฟรมเดียว (เกิด Enter แต่ไม่มี Stay ตามมา) ถ้าดักแค่ Stay อย่างเดียวอาจพลาดได้
+    /// </summary>
+    private void HandleContactDamage(Collision2D other)
+    {
+        // Debug ชั่วคราว: ถ้า log นี้ไม่ขึ้นเลยตอนมอนพุ่งชนผู้เล่น แปลว่าปัญหาอยู่ที่ Physics setup
+        // (Collider หาย/เป็น Trigger/Layer Collision Matrix ปิดไว้) ไม่ใช่ปัญหาที่ logic ข้างล่าง
+        Debug.Log($"[Monster] ชนกับ: {other.gameObject.name}, isDashing={isDashing}");
+
         if (!isDashing || isDead || isStunned) return;
 
         if (Time.time - lastAttackTime < attackCooldown) return;
@@ -271,6 +296,8 @@ public class Monster : MonoBehaviour, IDamageable
 
         currentHP -= amount;
         PlayHitFlash();
+
+        Debug.Log($"[Monster] โดนดาเมจ {amount} -> เลือดเหลือ {Mathf.Max(currentHP, 0)}/{maxHP}");
 
         if (currentHP <= 0)
         {

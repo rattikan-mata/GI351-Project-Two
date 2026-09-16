@@ -30948,6 +30948,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 3770395947802688918, guid: 003637d8744daad4a956741f8e1d862b, type: 3}
+      propertyPath: m_BodyType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4195069576502474560, guid: 003637d8744daad4a956741f8e1d862b, type: 3}
       propertyPath: m_Size.x
       value: 2.7166667
@@ -30963,6 +30967,10 @@ PrefabInstance:
     - target: {fileID: 4195069576502474560, guid: 003637d8744daad4a956741f8e1d862b, type: 3}
       propertyPath: m_WasSpriteAssigned
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4426103180201198852, guid: 003637d8744daad4a956741f8e1d862b, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8236432238528281874, guid: 003637d8744daad4a956741f8e1d862b, type: 3}
       propertyPath: m_LocalScale.x
@@ -31016,7 +31024,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8916471863647617910, guid: 003637d8744daad4a956741f8e1d862b, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
