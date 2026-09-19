@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 4195069576502474560}
   - component: {fileID: 3770395947802688918}
   - component: {fileID: 6802481599056181250}
-  - component: {fileID: 8916471863647617910}
   - component: {fileID: 4426103180201198852}
   m_Layer: 0
   m_Name: Player
@@ -149,33 +148,16 @@ MonoBehaviour:
   maxHP: 20
   invincibilityDuration: 0.5
   tradeItemCount: 0
-  summonKey: 113
-  meleeKey: 32
-  allowMouseAttack: 1
-  meleeRange: 1
-  meleeDamage: 5
-  meleeCooldown: 0.5
-  meleeKnockbackForce: 6
-  meleeStunDuration: 1.5
-  monsterLayer:
+  pickupKey: 102
+  dropKey: 103
+  useItemKey: 32
+  pickupRange: 1
+  groundItemLayer:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 0
+  worldItemPrefab: {fileID: 0}
+  summonKey: 113
   knockbackDuration: 0.2
---- !u!114 &8916471863647617910
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1042247484374936918}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 531eb5c93a11f4247bfba31e3d26fea0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AmmoPickup
-  ammoAmount: 5
-  respawnSeconds: 15
-  spriteRenderer: {fileID: 0}
 --- !u!60 &4426103180201198852
 PolygonCollider2D:
   m_ObjectHideFlags: 0
