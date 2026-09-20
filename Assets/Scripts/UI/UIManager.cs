@@ -2,41 +2,63 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class UIManager : MonoBehaviour
 {
     public static UIManager Instance { get; private set; }
 
-    #region [Scene]
-    [Header("[Scene]")]
-    [SerializeField] private int mainMenuScene = 0;
+    #region [MAIN MENU]
+    [Header("[MAIN MENU]")]
     [SerializeField] private Button startButton;
     [SerializeField] private Button exitButton;
+    #endregion
 
-    [SerializeField] private int gamePlayScene = 1;
+    #region [GAME PLAY]
+    [Header("[GAME PLAY]")]
     [SerializeField] private GameObject pausePanel;
     [SerializeField] private Button resumeButton;
     [SerializeField] private Button restartButton;
-    [SerializeField] private Button pauseExitButton;
+    [SerializeField] private Button gameplayExitButton;
     #endregion
 
-    #region [Player]
-    [Header("[Player]")]
-    [SerializeField] private Scrollbar playerHpScrollbar;
-    [SerializeField] private Image[] inventory = new Image[4];
-    [SerializeField] private Color selectedSlotColor = Color.yellow;
+    #region [HP BAR]
+    [Header("[HP BAR]")]
+    [SerializeField] private GameObject playerPrefab;
+    [SerializeField] private Scrollbar playerScrollbar;
+
+    [SerializeField] private GameObject enemyPrefab;
+    [SerializeField] private Scrollbar enemyScrollbar;
+    #endregion
+
+    #region [INVENTORY]
+    [System.Serializable]
+    public class InventorySlotUI
+    {
+        public GameObject itemPrefab;
+        public Image slotSprite;
+        public TextMeshProUGUI numberText;
+    }
+
+    [Header("[INVENTORY]")]
+    [SerializeField] private InventorySlotUI[] inventorySlots = new InventorySlotUI[4];
+
+    [Header("Slot Colors")]
     [SerializeField] private Color normalSlotColor = Color.white;
+    [SerializeField] private Color selectedSlotColor = Color.yellow;
     #endregion
 
-    #region [Enemy]
-    [Header("[Enemy]")]
-    [SerializeField] private Scrollbar enemyHpScrollbar;
+    #region [SCENE SETTINGS]
+    [Header("[SCENE SETTINGS]")]
+    [SerializeField] private string mainMenuSceneName = "MainMenu";
+    [SerializeField] private string gameplaySceneName = "Gameplay";
+    [SerializeField] private int mainMenuBuildIndex = 0;
+    [SerializeField] private int gameplayBuildIndex = 1;
     #endregion
 
     private int currentSelectedSlot = 0;
     private bool isPaused = false;
-
-    public event Action<int> OnUseItem;
+    private Sprite[] defaultSlotSprites;
 
     private void Awake()
     {
@@ -46,6 +68,15 @@ public class UIManager : MonoBehaviour
             return;
         }
         Instance = this;
+
+        defaultSlotSprites = new Sprite[inventorySlots.Length];
+        for (int i = 0; i < inventorySlots.Length; i++)
+        {
+            if (inventorySlots[i] != null && inventorySlots[i].slotSprite != null)
+            {
+                defaultSlotSprites[i] = inventorySlots[i].slotSprite.sprite;
+            }
+        }
     }
 
     private void Start()
@@ -53,12 +84,13 @@ public class UIManager : MonoBehaviour
         Time.timeScale = 1f;
         SetupButtons();
 
-        SelectInventorySlot(0);
-
         if (pausePanel != null)
         {
             pausePanel.SetActive(false);
         }
+
+        InitializeStartingItems();
+        UpdateSlotSelectionVisual(0);
     }
 
     private void Update()
@@ -67,93 +99,21 @@ public class UIManager : MonoBehaviour
 
         if (!isPaused)
         {
-            HandleInventoryInput();
+            HandleInventorySelectionInput();
+            UpdateInventoryUI();
         }
+
+        UpdateHealthBarsRealtime();
     }
 
-    #region PLAYER & INVENTORY
-    public void UpdatePlayerHP(float currentHP, float maxHP)
+    #region 1. SCENE MANAGEMENT & PAUSE
+    private void SetupButtons()
     {
-        if (playerHpScrollbar != null)
-        {
-            float normalized = (maxHP > 0f) ? Mathf.Clamp01(currentHP / maxHP) : 0f;
-            playerHpScrollbar.size = normalized;
-            playerHpScrollbar.value = normalized;
-        }
-    }
-
-    private void HandleInventoryInput()
-    {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) SelectInventorySlot(0);
-        else if (Input.GetKeyDown(KeyCode.Alpha2)) SelectInventorySlot(1);
-        else if (Input.GetKeyDown(KeyCode.Alpha3)) SelectInventorySlot(2);
-        else if (Input.GetKeyDown(KeyCode.Alpha4)) SelectInventorySlot(3);
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            UseCurrentSelectedItem();
-        }
-    }
-
-    public void SelectInventorySlot(int index)
-    {
-        if (inventory == null || inventory.Length == 0) return;
-        if (index < 0 || index >= inventory.Length) return;
-
-        currentSelectedSlot = index;
-
-        for (int i = 0; i < inventory.Length; i++)
-        {
-            if (inventory[i] != null)
-            {
-                inventory[i].color = (i == currentSelectedSlot) ? selectedSlotColor : normalSlotColor;
-            }
-        }
-    }
-
-    private void UseCurrentSelectedItem()
-    {
-        OnUseItem?.Invoke(currentSelectedSlot);
-    }
-    #endregion
-
-    #region ENEMY HP
-    public void UpdateEnemyHP(float currentHP, float maxHP)
-    {
-        if (enemyHpScrollbar != null)
-        {
-            float normalized = (maxHP > 0f) ? Mathf.Clamp01(currentHP / maxHP) : 0f;
-            enemyHpScrollbar.size = normalized;
-            enemyHpScrollbar.value = normalized;
-        }
-    }
-    #endregion
-
-    #region SCENE MANAGEMENT (เชื่อมด้วย Build Index ไม่ใช้ String)
-    public void StartGame()
-    {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(gamePlayScene);
-    }
-
-    public void ExitToMainMenu()
-    {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(mainMenuScene);
-    }
-
-    public void RestartGame()
-    {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
-
-    public void QuitGame()
-    {
-        Application.Quit();
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#endif
+        if (startButton != null) startButton.onClick.AddListener(StartGame);
+        if (exitButton != null) exitButton.onClick.AddListener(QuitGame);
+        if (resumeButton != null) resumeButton.onClick.AddListener(ResumeGame);
+        if (restartButton != null) restartButton.onClick.AddListener(RestartGame);
+        if (gameplayExitButton != null) gameplayExitButton.onClick.AddListener(ExitToMainMenu);
     }
 
     private void HandlePauseInput()
@@ -167,32 +127,229 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void PauseGame()
+    public void StartGame()
     {
-        if (pausePanel == null) return;
-
-        isPaused = true;
-        pausePanel.SetActive(true);
-        Time.timeScale = 0f;
+        Time.timeScale = 1f;
+        if (Application.CanStreamedLevelBeLoaded(gameplaySceneName))
+            SceneManager.LoadScene(gameplaySceneName);
+        else
+            SceneManager.LoadScene(gameplayBuildIndex);
     }
 
     public void ResumeGame()
     {
         if (pausePanel == null) return;
-
         isPaused = false;
         pausePanel.SetActive(false);
         Time.timeScale = 1f;
     }
 
-    private void SetupButtons()
+    public void PauseGame()
     {
-        if (startButton != null) startButton.onClick.AddListener(StartGame);
-        if (exitButton != null) exitButton.onClick.AddListener(QuitGame);
+        if (pausePanel == null) return;
+        isPaused = true;
+        pausePanel.SetActive(true);
+        Time.timeScale = 0f;
+    }
 
-        if (resumeButton != null) resumeButton.onClick.AddListener(ResumeGame);
-        if (restartButton != null) restartButton.onClick.AddListener(RestartGame);
-        if (pauseExitButton != null) pauseExitButton.onClick.AddListener(ExitToMainMenu);
+    public void RestartGame()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void ExitToMainMenu()
+    {
+        Time.timeScale = 1f;
+        if (Application.CanStreamedLevelBeLoaded(mainMenuSceneName))
+            SceneManager.LoadScene(mainMenuSceneName);
+        else
+            SceneManager.LoadScene(mainMenuBuildIndex);
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
+    }
+    #endregion
+
+    #region 2 & 3. HP BARS (REALTIME)
+    private void UpdateHealthBarsRealtime()
+    {
+        if (playerScrollbar != null)
+        {
+            float playerHP = 0f;
+            float playerMaxHP = 20f;
+
+            if (PlayerController.Instance != null)
+            {
+                playerHP = PlayerController.Instance.CurrentHP;
+                playerMaxHP = PlayerController.Instance.MaxHP;
+            }
+            else if (playerPrefab != null && playerPrefab.TryGetComponent<PlayerController>(out var pc))
+            {
+                playerHP = pc.CurrentHP;
+                playerMaxHP = pc.MaxHP;
+            }
+
+            float fill = playerMaxHP > 0f ? Mathf.Clamp01(playerHP / playerMaxHP) : 0f;
+            playerScrollbar.size = fill;
+            playerScrollbar.value = fill;
+        }
+
+        if (enemyScrollbar != null)
+        {
+            float enemyHP = 0f;
+            float enemyMaxHP = 20f;
+            Monster enemyTarget = null;
+
+            if (enemyPrefab != null && enemyPrefab.scene.IsValid())
+            {
+                enemyTarget = enemyPrefab.GetComponent<Monster>();
+            }
+
+            if (enemyTarget == null)
+            {
+#if UNITY_2023_1_OR_NEWER
+                enemyTarget = FindFirstObjectByType<Monster>();
+#else
+                enemyTarget = FindObjectOfType<Monster>();
+#endif
+            }
+
+            if (enemyTarget != null)
+            {
+                enemyHP = enemyTarget.CurrentHP;
+                enemyMaxHP = enemyTarget.MaxHP;
+            }
+
+            float fill = enemyMaxHP > 0f ? Mathf.Clamp01(enemyHP / enemyMaxHP) : 0f;
+            enemyScrollbar.size = fill;
+            enemyScrollbar.value = fill;
+        }
+    }
+    #endregion
+
+    #region 4 & 5. INVENTORY & ITEM PREFABS
+    private void InitializeStartingItems()
+    {
+        if (PlayerController.Instance == null) return;
+
+        for (int i = 0; i < inventorySlots.Length; i++)
+        {
+            if (i >= PlayerController.Instance.InventorySlots.Length) break;
+
+            if (inventorySlots[i] != null && inventorySlots[i].itemPrefab != null)
+            {
+                if (PlayerController.Instance.InventorySlots[i].item == null)
+                {
+                    WorldItem worldItem = inventorySlots[i].itemPrefab.GetComponent<WorldItem>();
+                    if (worldItem != null && worldItem.Data != null)
+                    {
+                        PlayerController.Instance.InventorySlots[i].item = worldItem.Data;
+                        PlayerController.Instance.InventorySlots[i].currentDurability =
+                            (worldItem.CurrentDurability > 0) ? worldItem.CurrentDurability : worldItem.Data.maxDurability;
+                    }
+                }
+            }
+        }
+    }
+
+    private void HandleInventorySelectionInput()
+    {
+        if (PlayerController.Instance != null)
+        {
+            currentSelectedSlot = PlayerController.Instance.ActiveSlotIndex;
+        }
+        else
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1)) currentSelectedSlot = 0;
+            else if (Input.GetKeyDown(KeyCode.Alpha2)) currentSelectedSlot = 1;
+            else if (Input.GetKeyDown(KeyCode.Alpha3)) currentSelectedSlot = 2;
+            else if (Input.GetKeyDown(KeyCode.Alpha4)) currentSelectedSlot = 3;
+        }
+
+        UpdateSlotSelectionVisual(currentSelectedSlot);
+    }
+
+    private void UpdateSlotSelectionVisual(int activeIndex)
+    {
+        for (int i = 0; i < inventorySlots.Length; i++)
+        {
+            if (inventorySlots[i] != null && inventorySlots[i].slotSprite != null)
+            {
+                inventorySlots[i].slotSprite.color = (i == activeIndex) ? selectedSlotColor : normalSlotColor;
+            }
+        }
+    }
+
+    private void UpdateInventoryUI()
+    {
+        UpdateInventoryUI(inventorySlots);
+    }
+
+    private void UpdateInventoryUI(InventorySlotUI[] inventorySlots1)
+    {
+        if (PlayerController.Instance == null) return;
+
+        var playerSlots = PlayerController.Instance.InventorySlots;
+
+        for (int i = 0; i < inventorySlots.Length; i++)
+        {
+            if (inventorySlots[i] == null) continue;
+
+            Image img = inventorySlots[i].slotSprite;
+            TextMeshProUGUI txt = inventorySlots1[i].numberText;
+
+            if (i < playerSlots.Length && playerSlots[i].item != null)
+            {
+                var slotData = playerSlots[i];
+                ItemData item = slotData.item;
+
+                if (img != null)
+                {
+                    img.sprite = (item.icon != null) ? item.icon : PlaceholderIconFactory.GetPlaceholder(item.itemType);
+                    img.enabled = true;
+                }
+
+                if (txt != null)
+                {
+                    if (item.maxDurability > 0)
+                    {
+                        txt.text = slotData.currentDurability.ToString();
+                    }
+                    else if (item.amount > 0)
+                    {
+                        txt.text = item.amount.ToString();
+                    }
+                    else
+                    {
+                        txt.text = "1";
+                    }
+                    txt.gameObject.SetActive(true);
+                }
+            }
+            else
+            {
+                if (img != null)
+                {
+                    img.sprite = (defaultSlotSprites != null && i < defaultSlotSprites.Length) ? defaultSlotSprites[i] : null;
+                    if (img.sprite == null)
+                    {
+                        img.enabled = false;
+                    }
+                }
+
+                if (txt != null)
+                {
+                    txt.text = "";
+                    txt.gameObject.SetActive(false);
+                }
+            }
+        }
     }
     #endregion
 }

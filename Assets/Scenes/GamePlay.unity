@@ -434,23 +434,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d289dfee32fe9f4e9618a8a76aea527, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
-  mainMenuScene: 0
   startButton: {fileID: 0}
   exitButton: {fileID: 0}
-  gamePlayScene: 1
   pausePanel: {fileID: 1351470216}
   resumeButton: {fileID: 1087733774}
   restartButton: {fileID: 492176489}
-  pauseExitButton: {fileID: 203009053}
-  playerHpScrollbar: {fileID: 1271590334}
-  inventory:
-  - {fileID: 1081142423}
-  - {fileID: 1341599978}
-  - {fileID: 2083667326}
-  - {fileID: 963042771}
-  selectedSlotColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  gameplayExitButton: {fileID: 0}
+  playerPrefab: {fileID: 0}
+  playerScrollbar: {fileID: 0}
+  enemyPrefab: {fileID: 0}
+  enemyScrollbar: {fileID: 0}
+  inventorySlots:
+  - itemPrefab: {fileID: 0}
+    slotSprite: {fileID: 0}
+    numberText: {fileID: 0}
+  - itemPrefab: {fileID: 0}
+    slotSprite: {fileID: 0}
+    numberText: {fileID: 0}
+  - itemPrefab: {fileID: 0}
+    slotSprite: {fileID: 0}
+    numberText: {fileID: 0}
+  - itemPrefab: {fileID: 0}
+    slotSprite: {fileID: 0}
+    numberText: {fileID: 0}
   normalSlotColor: {r: 1, g: 1, b: 1, a: 1}
-  enemyHpScrollbar: {fileID: 0}
+  selectedSlotColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  mainMenuSceneName: MainMenu
+  gameplaySceneName: Gameplay
+  mainMenuBuildIndex: 0
+  gameplayBuildIndex: 1
 --- !u!1 &271633496
 GameObject:
   m_ObjectHideFlags: 0
