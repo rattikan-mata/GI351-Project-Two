@@ -132,6 +132,18 @@ public class Monster : MonoBehaviour, IDamageable
                 spriteRenderer.color = isStunned ? stunColor : originalColor;
             }
         }
+
+        if (spriteRenderer != null && !isDead && !isStunned)
+        {
+            if (rb.linearVelocity.x < -0.1f) // เดินไปทางซ้าย
+            {
+                spriteRenderer.flipX = true;
+            }
+            else if (rb.linearVelocity.x > 0.1f) // เดินไปทางขวา
+            {
+                spriteRenderer.flipX = false;
+            }
+        }
     }
 
     protected virtual void FixedUpdate()

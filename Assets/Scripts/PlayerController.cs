@@ -12,6 +12,8 @@ public class PlayerController : MonoBehaviour
     #region Movement
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 4f;
+    [SerializeField] private Animator anim;
+    [SerializeField] private SpriteRenderer spriteRenderer; 
 
     private Rigidbody2D rb;
     private Vector2 moveInput;
@@ -415,16 +417,24 @@ public class PlayerController : MonoBehaviour
         // เดินทแยงได้
         moveInput = new Vector2(h, v);
         currentVelocity = moveInput.normalized * moveSpeed;
+
+        // ++ เพิ่มบล็อกโค้ดด้านล่างนี้ เพื่อสั่งเปิด/ปิด อนิเมชั่นเดิน ++
+        if (anim != null)
+        {
+            // sqrMagnitude > 0 หมายถึงมีการกดปุ่มทิศทางอยู่ (ความเร็วไม่เป็น 0)
+            anim.SetBool("isMoving", moveInput.sqrMagnitude > 0);
+        }
     }
 
     private void UpdateFacingToMouse()
     {
         if (Camera.main == null) return;
 
+        // ตัวแปรถูกประกาศและคำนวณไว้ตรงนี้แล้ว
         Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 dir = (Vector2)mouseWorld - (Vector2)transform.position;
 
-        if (dir == Vector2.zero) return; //เมาส์ทับตัวผู้เล่นพอดี -> คงทิศเดิมไว้
+        if (dir == Vector2.zero) return;
 
         //แปลงทิศเวกเตอร์เป็น 8 ทิศ (ทุกๆ 45 องศา)
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
@@ -444,7 +454,15 @@ public class PlayerController : MonoBehaviour
         }
 
         UpdateFirePointPosition();
+
+        // ++ นำค่า dir ที่คำนวณไว้ด้านบนมาใช้ได้เลย ไม่ต้องประกาศใหม่ ++
+        if (spriteRenderer != null)
+        {
+            // ถ้าเมาส์อยู่ฝั่งซ้าย (แกน x ติดลบ) ให้พลิกภาพ
+            spriteRenderer.flipX = dir.x < 0;
+        }
     }
+
 
     //ย้ายจุดยิงไปตามทิศที่ผู้เล่นหันอยู่ จะได้ยิงออกจากด้านหน้าเสมอ
     private void UpdateFirePointPosition()
