@@ -1923,7 +1923,7 @@ GameObject:
   - component: {fileID: 1345295782}
   - component: {fileID: 1345295781}
   m_Layer: 0
-  m_Name: 'BG-3 '
+  m_Name: Leyer 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3404,7 +3404,7 @@ GameObject:
   - component: {fileID: 1563524710}
   - component: {fileID: 1563524709}
   m_Layer: 0
-  m_Name: BG-1-Glass
+  m_Name: Leyer 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4352,9 +4352,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2072627862}
-  - {fileID: 1563524708}
-  - {fileID: 1966466566}
   - {fileID: 1345295780}
+  - {fileID: 1966466566}
+  - {fileID: 1563524708}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1753597066 stripped
@@ -4505,7 +4505,7 @@ GameObject:
   - component: {fileID: 1966466568}
   - component: {fileID: 1966466567}
   m_Layer: 0
-  m_Name: BG-2
+  m_Name: Leyer 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5312,7 +5312,7 @@ GameObject:
   - component: {fileID: 2072627864}
   - component: {fileID: 2072627863}
   m_Layer: 0
-  m_Name: BG-0-Out view
+  m_Name: Leyer 0 Out view
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
