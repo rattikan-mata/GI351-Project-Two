@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Monk Fist
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   itemName: Item
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 5ef45f5d4149eb84ea85d19364f07045, type: 3}
   itemType: 8
   amount: 1
   summonPrefab: {fileID: 0}
