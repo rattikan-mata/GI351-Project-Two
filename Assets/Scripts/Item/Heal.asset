@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Heal
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   itemName: Item
-  icon: {fileID: 0}
+  icon: {fileID: 7145198348311737387, guid: 5738f697d62538c4296acacf15f99c0b, type: 3}
   itemType: 7
   amount: 1
   summonPrefab: {fileID: 0}
