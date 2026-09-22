@@ -35112,6 +35112,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1042247484374936918, guid: 003637d8744daad4a956741f8e1d862b, type: 3}
   m_PrefabInstance: {fileID: 5675605451246718092}
   m_PrefabAsset: {fileID: 0}
+--- !u!212 &1634519229 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 4195069576502474560, guid: 003637d8744daad4a956741f8e1d862b, type: 3}
+  m_PrefabInstance: {fileID: 5675605451246718092}
+  m_PrefabAsset: {fileID: 0}
 --- !u!95 &1634519232
 Animator:
   serializedVersion: 7
@@ -37364,9 +37369,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: 2e68488c6b3816e48b4fae59d8251b8a, type: 3}
     - target: {fileID: 6802481599056181250, guid: 003637d8744daad4a956741f8e1d862b, type: 3}
+      propertyPath: anim
+      value: 
+      objectReference: {fileID: 1634519232}
+    - target: {fileID: 6802481599056181250, guid: 003637d8744daad4a956741f8e1d862b, type: 3}
       propertyPath: pickupRange
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 6802481599056181250, guid: 003637d8744daad4a956741f8e1d862b, type: 3}
+      propertyPath: spriteRenderer
+      value: 
+      objectReference: {fileID: 1634519229}
     - target: {fileID: 6802481599056181250, guid: 003637d8744daad4a956741f8e1d862b, type: 3}
       propertyPath: worldItemPrefab
       value: 
