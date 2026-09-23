@@ -14,11 +14,11 @@ public class ItemData : ScriptableObject
         HealPotion,     // ฮีลทันที (ใช้ครั้งเดียวหมด)
         TradeItem,      // ของแลกที่ต้นไม้ (ใช้ครั้งเดียวหมด)
         SummonToken,    // เรียกพระ (ใช้ครั้งเดียวหมด)
-        MeleeSpin,      // มีดพร้า - หมุนรอบตัว ดาเมจรอบตัว (มีความคงทน)
-        ShotgunArc,     // ข้าวสารเสก - ยิงกระจายเป็นมุม เหมือนช็อตกัน (มีความคงทน)
-        SniperShot,     // หนังสติ๊ - ยิงตรงระยะไกล (มีความคงทน)
+        MeleeSpin,      // มีดพร้า - ดาบหมุนวนรอบตัวต่อเนื่องหลายวินาที (มีความคงทน)
+        ShotgunArc,     // ข้าวสารเสก - สาดกระจายเป็นมุมหลายเวฟติดๆ กัน หันหน้าไม่ได้ระหว่างสาด (มีความคงทน)
+        SniperShot,     // หนังสติ๊ก - ยิงลูกระเบิดตรงไปข้างหน้า ชนแล้วระเบิด + มีกระสุนกระจาย (มีความคงทน)
         HealOverTime,   // หงส์เขียว - ฮีลค่อยๆ ทยอยขึ้น (มีความคงทน)
-        MeleePunch      // หมัดพระ - ตีตรงหน้า ผลักกระเดน ไม่มีสตัน (มีความคงทน)
+        MeleePunch      // หมัดพระ - ตีตรงหน้า โดนตัวเดียว ผลักกระเด็น ไม่มีสตัน (มีความคงทน)
     }
 
     #region Basic Info
@@ -54,34 +54,121 @@ public class ItemData : ScriptableObject
 
     #region Common Weapon Stats
     [Header("Common Weapon Stats (ใช้ร่วมกันหลายประเภท)")]
-    public float useCooldown = 0.5f;   // cooldown ระหว่างการใช้แต่ละครั้ง
-    public int damage = 10;            // ดาเมจ
-    public float knockbackForce = 6f;  // แรงผลักมอนกระเดน
-    public float stunDuration = 0f;    // เวลาสตันมอน (0 = ไม่สตัน)
+    [Tooltip("cooldown ระหว่างการใช้แต่ละครั้ง (นับจากตอนกดใช้)")]
+    public float useCooldown = 0.5f;
+
+    [Tooltip("ดาเมจ: มีดพร้า = ดาเมจต่อการโดน 1 ครั้ง / ข้าวสาร = ดาเมจต่อเม็ด / หนังสติ๊ก = ดาเมจระเบิด / หมัดพระ = ดาเมจหมัด")]
+    public int damage = 10;
+
+    [Tooltip("แรงผลักมอนกระเด็น")]
+    public float knockbackForce = 6f;
+
+    [Tooltip("เวลาสตันมอน (0 = ไม่สตัน) หมัดพระไม่ใช้ค่านี้")]
+    public float stunDuration = 0f;
     #endregion
 
-    #region Melee Punch / Spin (หมัดพระ / มีดพร้า)
-    [Header("Melee Range (หมัดพระ ใช้ค่านี้)")]
-    public float meleeRange = 1.2f;    // ระยะตีตรงหน้า
+    #region Melee Punch (หมัดพระ)
+    [Header("Melee Punch (หมัดพระ)")]
+    [Tooltip("ระยะตีตรงหน้า")]
+    public float meleeRange = 1.2f;
 
-    [Header("Spin Radius (มีดพร้า ใช้ค่านี้)")]
-    public float spinRadius = 2f;      // ระยะ AoE รอบตัวตอนหมุน
+    [Tooltip("จำนวนมอนสูงสุดที่หมัดหนึ่งครั้งตีโดนได้ (1 = ตัวเดียว ไม่มีดาเมจหมู่ / เลือกตัวที่ใกล้ผู้เล่นที่สุด)")]
+    public int punchMaxTargets = 1;
     #endregion
 
-    #region Shotgun Arc (ข้าวสารเสก)
-    [Header("Shotgun Arc (ข้าวสารเสก)")]
-    public GameObject arcProjectilePrefab; // ใช้ Prefab ที่มี Projectile.cs
+    #region Spin Blades (มีดพร้า - สไตล์อัลติ Omar)
+    [Header("Spin Blades (มีดพร้า - ดาบหมุนรอบตัว)")]
+    [Tooltip("ระยะห่างของดาบจากตัวผู้เล่น (รัศมีวงโคจร)")]
+    public float spinRadius = 2f;
+
+    [Tooltip("ระยะเวลาที่ดาบหมุนอยู่ (วินาที)")]
+    public float spinDuration = 5f;
+
+    [Tooltip("ความเร็วหมุน (องศาต่อวินาที) 360 = หมุนรอบละ 1 วินาที")]
+    public float spinRotationSpeed = 360f;
+
+    [Tooltip("จำนวนดาบที่หมุนอยู่ (กระจายเท่าๆ กันรอบตัว)")]
+    public int spinBladeCount = 3;
+
+    [Tooltip("รัศมีตรวจจับของดาบแต่ละเล่ม (ยิ่งใหญ่ยิ่งตีโดนง่าย)")]
+    public float spinBladeHitRadius = 0.5f;
+
+    [Tooltip("มอนตัวเดิมจะโดนตีซ้ำได้ทุกกี่วินาที")]
+    public float spinHitInterval = 0.5f;
+
+    [Tooltip("(ไม่บังคับ) Prefab ภาพดาบ 1 เล่ม ถ้าไม่ใส่จะไม่มีภาพ แต่ยังตีโดนตามปกติ")]
+    public GameObject spinBladePrefab;
+    #endregion
+
+    #region Shotgun Arc (ข้าวสารเสก - สไตล์อัลติ Capheny)
+    [Header("Shotgun Arc (ข้าวสารเสก - สาดหลายเวฟ)")]
+    [Tooltip("ใช้ Prefab ที่มี Projectile.cs")]
+    public GameObject arcProjectilePrefab;
     public float arcProjectileSpeed = 10f;
-    public float arcAngle = 45f;           // มุมกระจายทั้งหมด (องศา) ปรับได้
-    public int pelletCount = 5;            // จำนวนกระสุนที่ยิงกระจายออกไป
-    public float arcRange = 6f;            // ระยะสูงสุดของกระสุนแต่ละนัด ปรับได้
+
+    [Tooltip("มุมกระจายทั้งหมดของ 1 เวฟ (องศา)")]
+    public float arcAngle = 45f;
+
+    [Tooltip("จำนวนกระสุนต่อ 1 เวฟ")]
+    public int pelletCount = 5;
+
+    [Tooltip("ระยะสูงสุดของกระสุนแต่ละนัด")]
+    public float arcRange = 6f;
+
+    [Tooltip("สาดกี่เวฟต่อวินาที (2 = ปาติดๆ กัน 2 ทีต่อวิ)")]
+    public float arcWavesPerSecond = 2f;
+
+    [Tooltip("ระยะเวลาสาดทั้งหมด (วินาที) จำนวนเวฟรวม = เวฟต่อวินาที x ระยะเวลา (2 x 2 = 4 เวฟ)")]
+    public float arcCastDuration = 2f;
+
+    [Tooltip("ติ๊กไว้ = ระหว่างสาดหันหน้าไม่ได้ (ทิศล็อกตามตอนกดใช้)")]
+    public bool arcLockFacing = true;
+
+    [Tooltip("ติ๊กไว้ = ระหว่างสาดเดินไม่ได้ด้วย")]
+    public bool arcLockMovement = false;
     #endregion
 
-    #region Sniper Shot (หนังสติ๊)
-    [Header("Sniper Shot (หนังสติ๊)")]
-    public GameObject sniperProjectilePrefab; // ใช้ Prefab ที่มี Projectile.cs
+    #region Sniper Shot (หนังสติ๊ก - ยิงลูกระเบิด)
+    [Header("Sniper Shot (หนังสติ๊ก - ลูกระเบิด)")]
+    [Tooltip("ใช้ Prefab ที่มี GrenadeProjectile.cs (ถ้าใส่ Prefab ที่มีแค่ Projectile.cs จะยิงตรงธรรมดาแบบเดิม)")]
+    public GameObject sniperProjectilePrefab;
     public float sniperSpeed = 20f;
-    public float sniperRange = 15f;           // ระยะไกล ปรับได้
+
+    [Tooltip("ระยะบินสูงสุดของลูกระเบิด")]
+    public float sniperRange = 15f;
+
+    [Header("Grenade Explosion (ระเบิด)")]
+    [Tooltip("รัศมีระเบิด (ดาเมจระเบิดใช้ค่า Damage ด้านบน)")]
+    public float explosionRadius = 2f;
+
+    [Tooltip("ติ๊กไว้ = บินสุดระยะแล้วระเบิดเองด้วย / ไม่ติ๊ก = หายไปเฉยๆ ถ้าไม่ชนอะไร")]
+    public bool explodeAtMaxRange = true;
+
+    [Tooltip("(ไม่บังคับ) เอฟเฟกต์ระเบิด")]
+    public GameObject explosionEffectPrefab;
+
+    [Tooltip("เอฟเฟกต์ระเบิดอยู่กี่วินาทีก่อนถูกลบ")]
+    public float explosionEffectLifetime = 1.5f;
+
+    [Header("Grenade Fragments (กระสุนกระจายหลังระเบิด)")]
+    [Tooltip("ใช้ Prefab ที่มี Projectile.cs")]
+    public GameObject fragmentPrefab;
+
+    [Tooltip("จำนวนกระสุนกระจาย (ยิงรอบทิศ 360 องศาเท่าๆ กัน)")]
+    public int fragmentCount = 8;
+
+    public float fragmentSpeed = 10f;
+    public float fragmentRange = 4f;
+    public int fragmentDamage = 5;
+
+    [Tooltip("หมุนมุมเริ่มต้นของกระสุนกระจาย (องศา)")]
+    public float fragmentAngleOffset = 0f;
+
+    [Tooltip("ระยะที่กระสุนกระจายเกิดห่างจากจุดระเบิด")]
+    public float fragmentSpawnOffset = 0.2f;
+
+    [Tooltip("ติ๊กไว้ = กระสุนกระจายไม่โดนตัวที่โดนลูกระเบิดชนตรงๆ ซ้ำ (กันมอนตัวนั้นโดนดาเมจซ้อนหลายเม็ด)")]
+    public bool fragmentsIgnoreDirectTarget = true;
     #endregion
 
     #region Heal Over Time (หงส์เขียว)

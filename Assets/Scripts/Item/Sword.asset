@@ -25,15 +25,38 @@ MonoBehaviour:
   knockbackForce: 6
   stunDuration: 0
   meleeRange: 0
+  punchMaxTargets: 0
   spinRadius: 2
+  spinDuration: 5
+  spinRotationSpeed: 360
+  spinBladeCount: 3
+  spinBladeHitRadius: 0.5
+  spinHitInterval: 0.5
+  spinBladePrefab: {fileID: 0}
   arcProjectilePrefab: {fileID: 0}
   arcProjectileSpeed: 0
   arcAngle: 0
   pelletCount: 0
   arcRange: 0
+  arcWavesPerSecond: 0
+  arcCastDuration: 0
+  arcLockFacing: 1
+  arcLockMovement: 0
   sniperProjectilePrefab: {fileID: 0}
   sniperSpeed: 0
   sniperRange: 0
+  explosionRadius: 0
+  explodeAtMaxRange: 0
+  explosionEffectPrefab: {fileID: 0}
+  explosionEffectLifetime: 0
+  fragmentPrefab: {fileID: 0}
+  fragmentCount: 0
+  fragmentSpeed: 0
+  fragmentRange: 0
+  fragmentDamage: 0
+  fragmentAngleOffset: 0
+  fragmentSpawnOffset: 0
+  fragmentsIgnoreDirectTarget: 1
   healTotalAmount: 0
   healDuration: 0
   healTickInterval: 0
