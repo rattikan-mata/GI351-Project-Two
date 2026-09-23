@@ -18,10 +18,10 @@ MonoBehaviour:
   amount: 1
   summonPrefab: {fileID: 0}
   summonOffset: {x: -1, y: 0}
-  maxDurability: 3
+  maxDurability: 10
   durabilityLossPerUse: 1
   useCooldown: 0.5
-  damage: 10
+  damage: 6
   knockbackForce: 30
   stunDuration: 0
   meleeRange: 2
