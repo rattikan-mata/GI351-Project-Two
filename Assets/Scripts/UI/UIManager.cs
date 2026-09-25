@@ -73,7 +73,7 @@ public class UIManager : MonoBehaviour
     #region [SCENE SETTINGS]
     [Header("[SCENE SETTINGS]")]
     [SerializeField] private string mainMenuSceneName = "MainMenu";
-    [SerializeField] private string gameplaySceneName = "Gameplay";
+    [SerializeField] private string gameplaySceneName = "MAP TEST";
     [SerializeField] private int mainMenuBuildIndex = 0;
     [SerializeField] private int gameplayBuildIndex = 1;
     #endregion
