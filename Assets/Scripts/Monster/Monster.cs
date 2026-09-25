@@ -325,6 +325,11 @@ public class Monster : MonoBehaviour, IDamageable
             healthBar.SetHP(currentHP, maxHP);
         }
 
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.ShowCombatText(transform.position, amount, false);
+        }
+
         Debug.Log($"[Monster] โดนดาเมจ {amount} -> เลือดเหลือ {Mathf.Max(currentHP, 0)}/{maxHP}");
 
         if (currentHP <= 0)

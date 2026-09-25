@@ -661,6 +661,11 @@ public class PlayerController : MonoBehaviour
         currentHP -= amount;
         invincibleUntil = Time.time + invincibilityDuration;
 
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.ShowCombatText(transform.position, amount, false);
+        }
+
         Debug.Log($"[Player] โดนดาเมจ {amount} -> เลือดเหลือ {Mathf.Max(currentHP, 0)}/{maxHP}");
 
         if (currentHP <= 0)
@@ -674,6 +679,12 @@ public class PlayerController : MonoBehaviour
     {
         if (isDead) return;
         currentHP = Mathf.Min(currentHP + amount, maxHP);
+
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.ShowCombatText(transform.position, amount, true);
+        }
+
         Debug.Log($"[Player] ฮีล +{amount} -> เลือดเหลือ {currentHP}/{maxHP}"); //debug ดูเลือดหลังฮีล
     }
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -26,9 +27,25 @@ public class UIManager : MonoBehaviour
     [Header("[HP BAR]")]
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private Scrollbar playerScrollbar;
+    #endregion
 
-    [SerializeField] private GameObject enemyPrefab;
-    [SerializeField] private Scrollbar enemyScrollbar;
+    #region [EFFECTS & FEEDBACK]
+    [Header("[EFFECTS & FEEDBACK]")]
+    [Tooltip("Prefab ตัวเลขลอย (มี TextMeshPro หรือ TextMeshProUGUI)")]
+    [SerializeField] private GameObject damageTextPrefab;
+
+    [Header("Low HP Screen Vignette")]
+    [Tooltip("Image สีแดงครอบทั้งหน้าจอใน Canvas")]
+    [SerializeField] private Image lowHealthVignette;
+    [Range(0f, 1f)]
+    [SerializeField] private float lowHealthThreshold = 0.3f;
+    [SerializeField] private float pulseSpeed = 4f;
+
+    [Header("Screen Shake Settings")]
+    [Tooltip("ลาก Camera.main หรือปล่อยว่างไว้ให้ดึงอัตโนมัติ")]
+    [SerializeField] private Camera targetCamera;
+    private Coroutine shakeCoroutine;
+    private Vector3 originalCameraLocalPos;
     #endregion
 
     #region [INVENTORY]
@@ -82,6 +99,16 @@ public class UIManager : MonoBehaviour
                 defaultSlotSprites[i] = inventorySlots[i].slotSprite.sprite;
             }
         }
+
+        if (targetCamera == null && Camera.main != null)
+        {
+            targetCamera = Camera.main;
+        }
+
+        if (targetCamera != null)
+        {
+            originalCameraLocalPos = targetCamera.transform.localPosition;
+        }
     }
 
     private void Start()
@@ -92,6 +119,11 @@ public class UIManager : MonoBehaviour
         if (pausePanel != null)
         {
             pausePanel.SetActive(false);
+        }
+
+        if (lowHealthVignette != null)
+        {
+            lowHealthVignette.enabled = false;
         }
 
         InitializeStartingItems();
@@ -109,9 +141,10 @@ public class UIManager : MonoBehaviour
         }
 
         UpdateHealthBarsRealtime();
+        UpdateLowHealthVignette();
     }
 
-    #region 1. HP BAR
+    #region 1. HP BAR & LOW HP EFFECT
     private void UpdateHealthBarsRealtime()
     {
         if (playerScrollbar != null)
@@ -136,9 +169,118 @@ public class UIManager : MonoBehaviour
             playerScrollbar.size = fill;
         }
     }
+
+    private void UpdateLowHealthVignette()
+    {
+        if (lowHealthVignette == null || PlayerController.Instance == null) return;
+
+        float maxHP = PlayerController.Instance.MaxHP;
+        float currentHP = PlayerController.Instance.CurrentHP;
+
+        if (maxHP <= 0f) return;
+
+        float ratio = currentHP / maxHP;
+
+        if (ratio <= lowHealthThreshold && ratio > 0f)
+        {
+            float intensity = 1f - (ratio / lowHealthThreshold);
+            float pulse = (Mathf.Sin(Time.time * pulseSpeed) + 1f) * 0.5f;
+            float alpha = Mathf.Lerp(0.2f, 0.7f, intensity * pulse);
+
+            Color color = lowHealthVignette.color;
+            color.a = alpha;
+            lowHealthVignette.color = color;
+            lowHealthVignette.enabled = true;
+        }
+        else
+        {
+            lowHealthVignette.enabled = false;
+        }
+    }
     #endregion
 
-    #region 2. INVENTORY & ITEM MANAGEMENT
+    #region 2. DAMAGE/HEAL TEXT & SCREEN SHAKE (PUBLIC API)
+    public void ShowCombatText(Vector3 worldPos, int amount, bool isHeal)
+    {
+        if (damageTextPrefab == null) return;
+
+        GameObject textObj = Instantiate(damageTextPrefab, worldPos + Vector3.up * 1f, Quaternion.identity);
+        TMP_Text tmp = textObj.GetComponentInChildren<TMP_Text>();
+        if (tmp != null)
+        {
+            tmp.text = isHeal ? $"+{amount}" : $"-{amount}";
+            tmp.color = isHeal ? Color.green : Color.red;
+        }
+
+        StartCoroutine(CombatTextFadeRoutine(textObj));
+    }
+
+    private IEnumerator CombatTextFadeRoutine(GameObject textObj)
+    {
+        float duration = 0.8f;
+        float speed = 1.2f;
+        float elapsed = 0f;
+
+        TMP_Text tmp = textObj.GetComponentInChildren<TMP_Text>();
+        Color startColor = tmp != null ? tmp.color : Color.white;
+
+        while (elapsed < duration)
+        {
+            if (textObj == null) yield break;
+
+            textObj.transform.position += Vector3.up * (speed * Time.deltaTime);
+
+            if (tmp != null)
+            {
+                float alpha = Mathf.Clamp01(1f - (elapsed / duration));
+                tmp.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
+            }
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        Destroy(textObj);
+    }
+
+    public void TriggerScreenShake(float duration = 3f, float magnitude = 0.25f)
+    {
+        if (targetCamera == null && Camera.main != null)
+        {
+            targetCamera = Camera.main;
+            originalCameraLocalPos = targetCamera.transform.localPosition;
+        }
+
+        if (targetCamera == null) return;
+
+        if (shakeCoroutine != null)
+        {
+            StopCoroutine(shakeCoroutine);
+        }
+        shakeCoroutine = StartCoroutine(ScreenShakeRoutine(duration, magnitude));
+    }
+
+    private IEnumerator ScreenShakeRoutine(float duration, float magnitude)
+    {
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            float x = UnityEngine.Random.Range(-1f, 1f) * magnitude;
+            float y = UnityEngine.Random.Range(-1f, 1f) * magnitude;
+
+            targetCamera.transform.localPosition = originalCameraLocalPos + new Vector3(x, y, 0f);
+
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        targetCamera.transform.localPosition = originalCameraLocalPos;
+        shakeCoroutine = null;
+    }
+    #endregion
+
+    #region 3. INVENTORY & ITEM MANAGEMENT
     private void InitializeStartingItems()
     {
         if (PlayerController.Instance == null) return;
@@ -253,7 +395,7 @@ public class UIManager : MonoBehaviour
     }
     #endregion
 
-    #region 3. SCENE MANAGEMENT & PAUSE
+    #region 4. SCENE MANAGEMENT & PAUSE
     private void SetupButtons()
     {
         if (startButton != null) startButton.onClick.AddListener(StartGame);
