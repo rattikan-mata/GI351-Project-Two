@@ -111,7 +111,7 @@ public class UIManager : MonoBehaviour
         UpdateHealthBarsRealtime();
     }
 
-    #region 1. HP BAR (ลดจากขวามาซ้าย)
+    #region 1. HP BAR
     private void UpdateHealthBarsRealtime()
     {
         if (playerScrollbar != null)
@@ -134,38 +134,6 @@ public class UIManager : MonoBehaviour
             playerScrollbar.direction = Scrollbar.Direction.LeftToRight;
             playerScrollbar.value = 0f;
             playerScrollbar.size = fill;
-        }
-
-        if (enemyScrollbar != null)
-        {
-            float enemyHP = 0f;
-            float enemyMaxHP = 20f;
-            Monster enemyTarget = null;
-
-            if (enemyPrefab != null && enemyPrefab.scene.IsValid())
-            {
-                enemyTarget = enemyPrefab.GetComponent<Monster>();
-            }
-
-            if (enemyTarget == null)
-            {
-#if UNITY_2023_1_OR_NEWER
-                enemyTarget = FindFirstObjectByType<Monster>();
-#else
-                enemyTarget = FindObjectOfType<Monster>();
-#endif
-            }
-
-            if (enemyTarget != null)
-            {
-                enemyHP = enemyTarget.CurrentHP;
-                enemyMaxHP = enemyTarget.MaxHP;
-            }
-
-            float fill = enemyMaxHP > 0f ? Mathf.Clamp01(enemyHP / enemyMaxHP) : 0f;
-            enemyScrollbar.direction = Scrollbar.Direction.LeftToRight;
-            enemyScrollbar.value = 0f;
-            enemyScrollbar.size = fill;
         }
     }
     #endregion

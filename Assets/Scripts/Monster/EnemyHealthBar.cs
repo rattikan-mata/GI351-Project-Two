@@ -22,8 +22,9 @@ public class EnemyHealthBar : MonoBehaviour
         if (hpScrollbar != null)
         {
             float normalized = (maxHP > 0f) ? Mathf.Clamp01(currentHP / maxHP) : 0f;
+            hpScrollbar.direction = Scrollbar.Direction.LeftToRight;
+            hpScrollbar.value = 0f;
             hpScrollbar.size = normalized;
-            hpScrollbar.value = normalized;
         }
     }
 }

@@ -8,6 +8,7 @@ public class Monster : MonoBehaviour, IDamageable
     #region Health
     [Header("Health")]
     [SerializeField] protected int maxHP = 10;
+    [SerializeField] protected EnemyHealthBar healthBar;
     protected int currentHP;
     public int CurrentHP => currentHP;
     public int MaxHP => maxHP;
@@ -92,6 +93,11 @@ public class Monster : MonoBehaviour, IDamageable
         rb.gravityScale = 0f;
         rb.freezeRotation = true;
 
+        if (healthBar == null)
+        {
+            healthBar = GetComponentInChildren<EnemyHealthBar>();
+        }
+
         // สำคัญ: ถ้า Rigidbody2D ของมอน/ผู้เล่นเป็น Kinematic ทั้งคู่ (ปกติของเกมที่คุมการเดินเองด้วย MovePosition)
         // Unity จะไม่ยิง OnCollisionEnter/Stay2D ให้เลยถ้าไม่เปิดตัวนี้ไว้ -> เป็นสาเหตุหลักที่ดาเมจ/HP ไม่ลด
         rb.useFullKinematicContacts = true;
@@ -110,6 +116,11 @@ public class Monster : MonoBehaviour, IDamageable
         if (PlayerController.Instance != null)
         {
             playerTransform = PlayerController.Instance.transform;
+        }
+
+        if (healthBar != null)
+        {
+            healthBar.SetHP(currentHP, maxHP);
         }
     }
 
@@ -308,6 +319,11 @@ public class Monster : MonoBehaviour, IDamageable
 
         currentHP -= amount;
         PlayHitFlash();
+
+        if (healthBar != null)
+        {
+            healthBar.SetHP(currentHP, maxHP);
+        }
 
         Debug.Log($"[Monster] โดนดาเมจ {amount} -> เลือดเหลือ {Mathf.Max(currentHP, 0)}/{maxHP}");
 
