@@ -4,7 +4,7 @@ using UnityEngine.UI;
 public class EnemyHealthBar : MonoBehaviour
 {
     [SerializeField] private Scrollbar hpScrollbar;
-    [SerializeField] private Vector3 localOffset = new Vector3(0, 1.75f, 0);
+    [SerializeField] private Vector3 localOffset = new Vector3(0, 100f, 0);
 
     private void Start()
     {
