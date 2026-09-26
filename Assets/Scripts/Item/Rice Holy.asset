@@ -14,6 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   itemName: Item
   icon: {fileID: -3708508325519384304, guid: 5738f697d62538c4296acacf15f99c0b, type: 3}
+  attackSprite: {fileID: -7253399201087325013, guid: e6e8ad95a308d0843a5640b2e112f378, type: 3}
+  attackSpriteDuration: 2
+  matchAttackSpriteToEffectDuration: 0
   itemType: 5
   amount: 1
   summonPrefab: {fileID: 0}
@@ -21,11 +24,14 @@ MonoBehaviour:
   maxDurability: 3
   durabilityLossPerUse: 1
   useCooldown: 0.5
-  damage: 2
+  damage: 5
   knockbackForce: 6
   stunDuration: 0
   meleeRange: 0
   punchMaxTargets: 1
+  punchIndicatorPrefab: {fileID: 0}
+  punchIndicatorColor: {r: 1, g: 1, b: 0, a: 0.5}
+  punchIndicatorDuration: 0.15
   spinRadius: 0
   spinDuration: 5
   spinRotationSpeed: 360

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7016222257066243927}
   - component: {fileID: 6776986437145526869}
   m_Layer: 0
-  m_Name: Bullet
+  m_Name: Boss
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -173,6 +173,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
   targetLayer:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 0
+  canHitPlayer: 1
   pierceThroughTargets: 0
   maxPierceCount: -1

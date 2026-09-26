@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7016222257066243927}
   - component: {fileID: 6776986437145526869}
   m_Layer: 0
-  m_Name: Bullet
+  m_Name: Explosive Bullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -174,5 +174,5 @@ MonoBehaviour:
   targetLayer:
     serializedVersion: 2
     m_Bits: 8
-  pierceThroughTargets: 0
+  pierceThroughTargets: 1
   maxPierceCount: -1

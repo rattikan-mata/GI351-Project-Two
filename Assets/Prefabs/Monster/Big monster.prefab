@@ -90,7 +90,7 @@ GameObject:
   - component: {fileID: 3952661412383416333}
   - component: {fileID: 4917181424410279538}
   m_Layer: 3
-  m_Name: Monster
+  m_Name: Big monster
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -184,8 +184,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6e3c54e26736c64db507103f4d2a9fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Monster
-  maxHP: 20
-  moveSpeed: 2
+  maxHP: 70
+  moveSpeed: 1
   detectionRange: 5
   stoppingDistance: 0.6
   spriteRenderer: {fileID: 0}

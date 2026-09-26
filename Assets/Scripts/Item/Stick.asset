@@ -14,6 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   itemName: Item
   icon: {fileID: 94058731202090889, guid: 5738f697d62538c4296acacf15f99c0b, type: 3}
+  attackSprite: {fileID: 5365709037875182577, guid: 38bfe255aecb53b4b9ca10a650889b3c, type: 3}
+  attackSpriteDuration: 0.2
+  matchAttackSpriteToEffectDuration: 1
   itemType: 6
   amount: 1
   summonPrefab: {fileID: 0}
@@ -26,6 +29,9 @@ MonoBehaviour:
   stunDuration: 0
   meleeRange: 0
   punchMaxTargets: 0
+  punchIndicatorPrefab: {fileID: 0}
+  punchIndicatorColor: {r: 1, g: 1, b: 0, a: 0.5}
+  punchIndicatorDuration: 0.15
   spinRadius: 0
   spinDuration: 0
   spinRotationSpeed: 0
@@ -49,7 +55,7 @@ MonoBehaviour:
   explodeAtMaxRange: 1
   explosionEffectPrefab: {fileID: 0}
   explosionEffectLifetime: 1.5
-  fragmentPrefab: {fileID: 2270187744293289748, guid: cbba1a09de8843d44af095b8522b1615, type: 3}
+  fragmentPrefab: {fileID: 2270187744293289748, guid: 57e06cd8a60fea34a891946e1bd436a3, type: 3}
   fragmentCount: 8
   fragmentSpeed: 10
   fragmentRange: 4

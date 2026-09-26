@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -29,9 +30,9 @@ public class Monster : MonoBehaviour, IDamageable
     [SerializeField] protected SpriteRenderer spriteRenderer;
     [SerializeField] protected float hitFlashDuration = 0.1f;
 
-    private Color originalColor;
+    protected Color originalColor; // เปิดเป็น protected ให้คลาสลูก (เช่น BossController) ใช้ตอนกระพริบสีเตือนท่าได้
     private float flashUntil = 0f;
-    private bool isFlashing = false;
+    protected bool isFlashing = false; // เปิดเป็น protected เหตุผลเดียวกับด้านบน
     #endregion
 
     #region Stun
@@ -51,9 +52,28 @@ public class Monster : MonoBehaviour, IDamageable
     protected bool isKnockedBack = false;
     #endregion
 
-    #region Item Drop (Summon พระ)
+    #region Item Drop (ดรอปไอเทมสุ่มตอนตาย ปรับได้ว่าใส่ไอเทมอะไรเข้าไปได้บ้าง)
+    [System.Serializable]
+    public class DropEntry
+    {
+        [Tooltip("ItemData ที่จะดรอป (ใช้ได้ทั้งไอเทมใช้ครั้งเดียวและไอเทมอาวุธที่มีความคงทน)")]
+        public ItemData item;
+
+        [Tooltip("น้ำหนักในการสุ่ม เทียบกับรายการอื่นในลิสต์นี้ (ยิ่งมากยิ่งดรอปบ่อย ไม่ใช่ % ตรงๆ)")]
+        public float weight = 1f;
+    }
+
     [Header("Item Drop")]
+    [Tooltip("โอกาสที่มอนตัวนี้จะดรอปของเมื่อตาย (0-1) ถ้าดรอปสำเร็จ จะสุ่มเลือก 1 ชิ้นจาก Drop Table ด้านล่างตามน้ำหนัก")]
     [SerializeField, Range(0f, 1f)] protected float dropChance = 0.3f;
+
+    [Tooltip("ลาก Prefab เปล่าที่มีแค่ WorldItem.cs (เช่น Prefabs/Item) ใช้ตอนดรอปไอเทมจาก Drop Table ด้านล่าง")]
+    [SerializeField] protected GameObject worldItemPrefab;
+
+    [Tooltip("รายการไอเทมที่มอนตัวนี้ดรอปได้ ปรับได้อิสระต่อมอนแต่ละตัว/แต่ละ Prefab เช่น มอนธรรมดาดรอปกระสุน/ยาฮีล มอนพิเศษดรอปอาวุธ")]
+    [SerializeField] protected List<DropEntry> dropTable = new List<DropEntry>();
+
+    [Tooltip("(ทางเลือกเสริม) Prefab พิเศษที่ไม่ใช่ WorldItem ธรรมดา เช่นไอเทม Summon ที่มี component เฉพาะของตัวเอง ถ้าตั้งไว้และ Drop Table ว่าง/สุ่มไม่ได้ จะดรอปตัวนี้แทน")]
     [SerializeField] protected GameObject dropItemPrefab;
     #endregion
 
@@ -293,11 +313,53 @@ public class Monster : MonoBehaviour, IDamageable
     #region Item Drop Logic
     protected virtual void TryDropItem()
     {
-        if (dropItemPrefab == null) return;
-        if (Random.value <= dropChance)
+        if (Random.value > dropChance) return; // ไม่ติดโอกาสดรอปรอบนี้
+
+        ItemData chosenItem = ChooseDropItem();
+
+        if (chosenItem != null && worldItemPrefab != null)
+        {
+            GameObject obj = Instantiate(worldItemPrefab, transform.position, Quaternion.identity);
+            if (obj.TryGetComponent<WorldItem>(out var worldItem))
+            {
+                // durability ไม่ระบุ (-1) -> WorldItem.Setup จะเติมความคงทนเต็มให้เองถ้าไอเทมนั้นมีความคงทน
+                worldItem.Setup(chosenItem);
+            }
+            return;
+        }
+
+        // Fallback: ไม่มี Drop Table ที่ใช้ได้ (ว่าง/น้ำหนักรวมเป็น 0/ไม่ได้ลาก World Item Prefab ไว้)
+        // -> ถ้าตั้ง Drop Item Prefab แบบเดิมไว้ ก็ยังดรอปตัวนั้นได้ตามปกติ
+        if (dropItemPrefab != null)
         {
             Instantiate(dropItemPrefab, transform.position, Quaternion.identity);
         }
+    }
+
+    // สุ่มเลือกไอเทม 1 ชิ้นจาก dropTable ตามน้ำหนัก (Weighted Random)
+    // เช่น A weight 3, B weight 1 -> A มีโอกาสออก 75%, B 25% ของรอบที่ดรอปสำเร็จ
+    private ItemData ChooseDropItem()
+    {
+        if (dropTable == null || dropTable.Count == 0) return null;
+
+        float totalWeight = 0f;
+        foreach (var entry in dropTable)
+        {
+            if (entry != null && entry.item != null) totalWeight += Mathf.Max(0f, entry.weight);
+        }
+        if (totalWeight <= 0f) return null;
+
+        float roll = Random.value * totalWeight;
+        float cumulative = 0f;
+
+        foreach (var entry in dropTable)
+        {
+            if (entry == null || entry.item == null) continue;
+            cumulative += Mathf.Max(0f, entry.weight);
+            if (roll <= cumulative) return entry.item;
+        }
+
+        return null; // เผื่อ floating point คลาดเคลื่อนนิดหน่อย
     }
     #endregion
 

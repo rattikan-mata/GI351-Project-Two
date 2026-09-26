@@ -20,6 +20,14 @@ public class PlayerController : MonoBehaviour
     private Vector2 moveInput;
     private Vector2 currentVelocity;
 
+    // ใช้สลับสไปรต์ตัวผู้เล่นทั้งตัวเป็นท่าโจมตี (แบบ Terraria) ตอนกดใช้ไอเทม แล้วสลับกลับเองอัตโนมัติ
+    private Coroutine attackSpriteCoroutine;
+
+    // สถานะ "ก่อนเริ่มโจมตีจริงๆ" จำไว้แค่ครั้งเดียวตอนไม่มี attack sprite ค้างอยู่ (กันบัคตอนกดรัว
+    // ที่เดิมจะไปจำสถานะที่ถูกท่าโจมตีเขียนทับไปแล้วซ้ำๆ จนคืนค่าผิดตอนจบ)
+    private bool animatorWasEnabledBeforeAttack = true;
+    private Sprite spriteBeforeAnyAttack;
+
     public FacingDirection CurrentFacing { get; private set; } = FacingDirection.Down;
     #endregion
 
@@ -298,6 +306,14 @@ public class PlayerController : MonoBehaviour
                 break;
         }
 
+        // สลับสไปรต์ตัวผู้เล่นเป็นท่าโจมตีเฉพาะตอนที่ใช้ "สำเร็จจริง" เท่านั้น
+        // (สำคัญ: ถ้าเรียกไว้ก่อนเช็คผลลัพธ์ สแปมกดตอนสกิลเดิมยังทำงานอยู่ เช่น มีดพร้ากำลังหมุน/ข้าวสารกำลังสาด
+        // จะไปรีสตาร์ตนับเวลาโชว์สไปรต์ใหม่ทุกครั้งที่กด ทำให้สไปรต์ไม่มีวันกลับเป็นปกติ)
+        if (used)
+        {
+            PlayAttackSpriteIfAny(item);
+        }
+
         return used;
     }
 
@@ -329,6 +345,70 @@ public class PlayerController : MonoBehaviour
             if (inventorySlots[i].item == null) return i;
         }
         return -1;
+    }
+
+    /// <summary>
+    /// สลับสไปรต์ตัวผู้เล่นทั้งตัวเป็นท่าโจมตี (เช่น ท่าถือมีดพร้า) ชั่วคราวแบบ Terraria
+    /// ถ้า item.attackSprite ไม่ได้ตั้งไว้ จะไม่ทำอะไรเลย (ใช้สไปรต์ปกติของ Animator ต่อไปตามเดิม)
+    /// </summary>
+    private void PlayAttackSpriteIfAny(ItemData item)
+    {
+        if (item.attackSprite == null || spriteRenderer == null) return;
+
+        // จำสถานะเดิมแค่ตอน "เริ่มโจมตีจริงๆ" (ยังไม่มี attack sprite ค้างอยู่) เท่านั้น
+        // กันบัคตอนกดรัว: ถ้ากดซ้ำระหว่างที่ยังโชว์ท่าโจมตีค้างอยู่ จะไม่จำสถานะที่ถูกเขียนทับไปแล้วซ้ำ
+        if (attackSpriteCoroutine == null)
+        {
+            if (anim != null) animatorWasEnabledBeforeAttack = anim.enabled;
+            spriteBeforeAnyAttack = spriteRenderer.sprite;
+        }
+
+        if (attackSpriteCoroutine != null) StopCoroutine(attackSpriteCoroutine);
+
+        float duration = GetAttackSpriteDuration(item);
+        attackSpriteCoroutine = StartCoroutine(ShowAttackSpriteRoutine(item.attackSprite, duration));
+    }
+
+    /// <summary>
+    /// ระยะเวลาที่จะโชว์ Attack Sprite: ถ้า item ติ๊ก Match Attack Sprite To Effect Duration ไว้
+    /// จะยืดตามเวลาที่สกิลนั้นทำงานจริง (มีดพร้า = Spin Duration / ข้าวสารเสก = Arc Cast Duration ทั้งหมด)
+    /// ไม่ติ๊ก หรือเป็นชนิดอื่น -> ใช้ Attack Sprite Duration ตามปกติ
+    /// </summary>
+    private float GetAttackSpriteDuration(ItemData item)
+    {
+        if (!item.matchAttackSpriteToEffectDuration) return item.attackSpriteDuration;
+
+        switch (item.itemType)
+        {
+            case ItemData.ItemType.MeleeSpin: return item.spinDuration;
+            case ItemData.ItemType.ShotgunArc: return item.arcCastDuration;
+            default: return item.attackSpriteDuration;
+        }
+    }
+
+    private IEnumerator ShowAttackSpriteRoutine(Sprite atkSprite, float duration)
+    {
+        bool hasAnimator = anim != null;
+
+        // ปิด Animator ชั่วคราว กันมันเขียนทับสไปรต์ที่เราสั่งโชว์ทุกเฟรม
+        if (hasAnimator) anim.enabled = false;
+
+        spriteRenderer.sprite = atkSprite;
+
+        yield return new WaitForSeconds(duration);
+
+        if (hasAnimator)
+        {
+            // คืนค่าตามสถานะจริงก่อนเริ่มโจมตีครั้งแรก (ไม่ใช่ค่าที่แอบเป็น false จากการกดซ้อนระหว่างทาง)
+            anim.enabled = animatorWasEnabledBeforeAttack;
+        }
+        else
+        {
+            // ไม่มี Animator -> คืนสไปรต์ตัวจริงก่อนเริ่มโจมตีครั้งแรก (ไม่ใช่สไปรต์ท่าโจมตีที่ค้างจากการกดซ้อน)
+            spriteRenderer.sprite = spriteBeforeAnyAttack;
+        }
+
+        attackSpriteCoroutine = null;
     }
     #endregion
 
@@ -620,6 +700,14 @@ public class PlayerController : MonoBehaviour
     {
         Vector2 playerPos = transform.position;
         Vector2 origin = playerPos + GetFacingVector() * (data.meleeRange * 0.5f);
+
+        // Debug: เห็นวงกลม hitbox จริงตอนต่อยใน Scene View เหมือนระบบของ BossController
+        // (เช็คว่าระยะที่ตีโดนจริงตรงกับ Melee Range ที่ตั้งใน ItemData ไหม)
+        DrawDebugCircle(origin, data.meleeRange, Color.yellow, 0.3f);
+
+        // ภาพจริงที่เห็นในเกม (ไม่ใช่แค่ debug): สปอน Sprite hitbox ถ้าตั้ง Punch Indicator Prefab ไว้ใน ItemData
+        SpawnAreaIndicator(origin, data.meleeRange, data.punchIndicatorColor, data.punchIndicatorDuration, data.punchIndicatorPrefab);
+
         Collider2D[] hits = Physics2D.OverlapCircleAll(origin, data.meleeRange, monsterLayer);
 
         // รวบรวมมอนที่อยู่ในระยะ (กันซ้ำกรณีมอนตัวเดียวมีหลาย Collider)
@@ -647,6 +735,50 @@ public class PlayerController : MonoBehaviour
             monster.ApplyKnockback(dir, data.knockbackForce);
             //ตั้งใจไม่เรียก ApplyStun ตรงนี้ -> หมัดพระเอาสตันออกตามที่ต้องการ
         }
+    }
+
+    // วาดวงกลมด้วย Debug.DrawLine ให้เห็น hitbox จริงตอน Play (เหมือนของ BossController.cs)
+    // เห็นเฉพาะใน Scene View ตอนรัน Play Mode เท่านั้น ไม่โชว์ในเกมจริงตอน build
+    private void DrawDebugCircle(Vector2 center, float radius, Color color, float duration, int segments = 24)
+    {
+        if (radius <= 0f) return;
+
+        Vector3 prevPoint = center + new Vector2(radius, 0f);
+        for (int i = 1; i <= segments; i++)
+        {
+            float angle = (360f / segments) * i * Mathf.Deg2Rad;
+            Vector3 nextPoint = center + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * radius;
+            Debug.DrawLine(prevPoint, nextPoint, color, duration);
+            prevPoint = nextPoint;
+        }
+    }
+
+    // สปอนวัตถุโชว์ hitbox จริงชั่วคราว (เห็นในเกมจริง ไม่ใช่แค่ Debug) ปรับขนาดอัตโนมัติตามรัศมีที่ต้องการ
+    // ใช้ได้กับ Sprite รูปอะไรก็ได้ (วงกลม สี่เหลี่ยม ฯลฯ) เพราะสเกลตาม sprite.bounds.size.x ให้เส้นผ่านศูนย์กลาง = radius x 2 เสมอ
+    // เทคนิคเดียวกับ SpawnAreaIndicator ของ BossController.cs
+    private void SpawnAreaIndicator(Vector3 position, float radius, Color tint, float duration, GameObject indicatorPrefab)
+    {
+        if (indicatorPrefab == null || radius <= 0f) return;
+
+        GameObject obj = Instantiate(indicatorPrefab, position, Quaternion.identity);
+
+        if (obj.TryGetComponent<SpriteRenderer>(out var sr))
+        {
+            sr.color = tint;
+
+            float nativeWidth = (sr.sprite != null) ? sr.sprite.bounds.size.x : 1f;
+            if (nativeWidth > 0.0001f)
+            {
+                float scale = (radius * 2f) / nativeWidth; // รัศมี x 2 = เส้นผ่านศูนย์กลางที่ต้องการ
+                obj.transform.localScale = new Vector3(scale, scale, 1f);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[Player] Punch Indicator Prefab ไม่มี SpriteRenderer -> ปรับขนาดอัตโนมัติไม่ได้", obj);
+        }
+
+        Destroy(obj, duration);
     }
 
     //ข้าวสารเสก (สไตล์อัลติ Capheny): สาดเป็นเวฟๆ ต่อเนื่อง ระหว่างสาดหันหน้าไม่ได้ (ทิศล็อกตั้งแต่ตอนกด)

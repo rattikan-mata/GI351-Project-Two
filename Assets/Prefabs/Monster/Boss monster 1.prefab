@@ -85,12 +85,12 @@ GameObject:
   m_Component:
   - component: {fileID: 8954104110159911395}
   - component: {fileID: 8355116657645598592}
-  - component: {fileID: 6142388055503164257}
   - component: {fileID: 7059108542250385496}
   - component: {fileID: 3952661412383416333}
   - component: {fileID: 4917181424410279538}
+  - component: {fileID: -1281301236709249638}
   m_Layer: 3
-  m_Name: Monster
+  m_Name: Boss monster 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -106,8 +106,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 610.43823, y: 586.0575, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 767341807573263942}
   m_Father: {fileID: 0}
@@ -172,49 +172,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
---- !u!114 &6142388055503164257
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3288230206911401485}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e6e3c54e26736c64db507103f4d2a9fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Monster
-  maxHP: 20
-  moveSpeed: 2
-  detectionRange: 5
-  stoppingDistance: 0.6
-  spriteRenderer: {fileID: 0}
-  hitFlashDuration: 0.1
-  stunColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  stunDuration: 1.5
-  knockbackDuration: 0.15
-  dropChance: 1
-  worldItemPrefab: {fileID: 7194281834610975454, guid: f93c9abf2450f2d458eb57dcccc24b6b, type: 3}
-  dropTable:
-  - item: {fileID: 11400000, guid: f5cb365cbbb268446befdbf19528d9a7, type: 2}
-    weight: 1
-  - item: {fileID: 11400000, guid: 3a96daef2844e604fa0264a565564e3e, type: 2}
-    weight: 1
-  - item: {fileID: 11400000, guid: 445a0b1ca03389c43afb72a3bce3a2e5, type: 2}
-    weight: 1
-  - item: {fileID: 11400000, guid: 2f676423b679ee1408567e8eaadb409c, type: 2}
-    weight: 1
-  dropItemPrefab: {fileID: 0}
-  contactDamage: 5
-  attackCooldown: 1
-  attackKnockbackForce: 5
-  dashAttackRange: 2
-  dashSpeed: 12
-  dashDuration: 0.25
-  dashRecoveryTime: 1.5
-  warningColor: {r: 1, g: 0, b: 0.08972883, a: 1}
-  warningDuration: 1
-  blinkInterval: 0.2
 --- !u!50 &7059108542250385496
 Rigidbody2D:
   serializedVersion: 5
@@ -320,6 +277,76 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-1281301236709249638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3288230206911401485}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfa41e0ce5c46474185b2f39bf284516, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossController
+  maxHP: 200
+  moveSpeed: 3
+  detectionRange: 15
+  stoppingDistance: 0.6
+  spriteRenderer: {fileID: 0}
+  hitFlashDuration: 0.1
+  stunColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  stunDuration: 1.5
+  knockbackDuration: 0.15
+  dropChance: 0.3
+  worldItemPrefab: {fileID: 0}
+  dropTable: []
+  dropItemPrefab: {fileID: 0}
+  contactDamage: 10
+  attackCooldown: 1
+  attackKnockbackForce: 5
+  dashAttackRange: 3
+  dashSpeed: 12
+  dashDuration: 0.25
+  dashRecoveryTime: 3
+  warningColor: {r: 0, g: 1, b: 1, a: 1}
+  warningDuration: 1.5
+  blinkInterval: 0.1
+  bossName: Boss
+  skillRange: 15
+  skillCooldown: 1.5
+  areaIndicatorPrefab: {fileID: 3664759133385990090, guid: 739aee3eaeec5944691401c44cbda48c, type: 3}
+  dashIndicatorColor: {r: 1, g: 0.5, b: 0, a: 0.5}
+  slamIndicatorColor: {r: 1, g: 0, b: 0, a: 0.5}
+  lineIndicatorPrefab: {fileID: 7966542724414560600, guid: dc24a69a454278845a2ea00d6d9ad031, type: 3}
+  lineIndicatorWidth: 0.3
+  dashSkillEnabled: 1
+  dashWeight: 3
+  projectileSkillEnabled: 1
+  projectileWeight: 2
+  projectilePrefab: {fileID: 2270187744293289748, guid: 7ed5cbfbf43b8704f88eee6b3ee5c2e6, type: 3}
+  projectileCount: 4
+  projectileArcAngle: 90
+  projectileSpeed: 10
+  projectileDamage: 8
+  projectileRange: 10
+  projectileKnockbackForce: 4
+  projectileTelegraphColor: {r: 0, g: 0.54531336, b: 1, a: 0.22745098}
+  projectileTelegraphDuration: 1.25
+  projectileBlinkInterval: 0.1
+  slamSkillEnabled: 1
+  slamWeight: 1
+  slamChargeSpeed: 18
+  slamChargeDuration: 0.5
+  slamRadius: 4
+  slamDamage: 10
+  slamKnockbackForce: 12
+  slamStunDuration: 0
+  slamTelegraphColor: {r: 1, g: 0, b: 0, a: 0.4745098}
+  slamTelegraphDuration: 1.1
+  slamBlinkInterval: 0.2
+  slamEffectPrefab: {fileID: 7584986430880826807, guid: 739aee3eaeec5944691401c44cbda48c, type: 3}
+  slamEffectLifetime: 1
 --- !u!1 &5487988489316432900
 GameObject:
   m_ObjectHideFlags: 0

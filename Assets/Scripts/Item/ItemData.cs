@@ -29,6 +29,18 @@ public class ItemData : ScriptableObject
     public Sprite icon;
     #endregion
 
+    #region Attack Visual (สลับสไปรต์ตัวผู้เล่นทั้งตัวตอนโจมตี แบบ Terraria)
+    [Header("Attack Visual (สลับสไปรต์ผู้เล่นตอนใช้ไอเทมนี้)")]
+    [Tooltip("สไปรต์ตัวผู้เล่นแบบถืออาวุธนี้ท่าโจมตี (เช่น ถือมีดพร้า) จะสลับไปโชว์ชั่วคราวตอนกดใช้ไอเทมนี้ ถ้าไม่ใส่จะไม่สลับสไปรต์ (ใช้สไปรต์ปกติของผู้เล่นตามเดิม)")]
+    public Sprite attackSprite;
+
+    [Tooltip("ระยะเวลาที่โชว์สไปรต์ท่าโจมตีนี้ก่อนสลับกลับเป็นสไปรต์ปกติ (วินาที)")]
+    public float attackSpriteDuration = 0.2f;
+
+    [Tooltip("ติ๊กเพื่อให้ยืดเวลาโชว์สไปรต์ตามระยะเวลาที่สกิลทำงานจริง (เช่น ระยะเวลาที่ดาบหมุน หรือสาดข้าวสาร)")]
+    public bool matchAttackSpriteToEffectDuration = false;
+    #endregion
+
     #region Type & Effect
     [Header("Type")]
     public ItemType itemType = ItemType.Ammo;
@@ -74,6 +86,15 @@ public class ItemData : ScriptableObject
 
     [Tooltip("จำนวนมอนสูงสุดที่หมัดหนึ่งครั้งตีโดนได้ (1 = ตัวเดียว ไม่มีดาเมจหมู่ / เลือกตัวที่ใกล้ผู้เล่นที่สุด)")]
     public int punchMaxTargets = 1;
+
+    [Tooltip("(ไม่บังคับ) ลาก Prefab ที่มี SpriteRenderer มาใส่ (จะเป็น Sprite วงกลม สี่เหลี่ยม หรือรูปอะไรก็ได้) จะสปอนขึ้นมาโชว์ hitbox จริงตอนต่อย ปรับขนาดอัตโนมัติให้เส้นผ่านศูนย์กลาง = Melee Range x 2 เสมอ เหมือนระบบ Area Indicator ของ Boss ถ้าไม่ใส่จะไม่มีภาพ (ยังตีโดนตามปกติ ดู hitbox ได้แค่เส้น Debug ใน Scene View)")]
+    public GameObject punchIndicatorPrefab;
+
+    [Tooltip("สีที่ย้อมทับ Sprite ตอนโชว์ hitbox (ใส่ Alpha ต่ำๆ จะได้โปร่งแสง)")]
+    public Color punchIndicatorColor = new Color(1f, 1f, 0f, 0.5f);
+
+    [Tooltip("โชว์ hitbox อยู่กี่วินาทีก่อนหาย")]
+    public float punchIndicatorDuration = 0.15f;
     #endregion
 
     #region Spin Blades (มีดพร้า - สไตล์อัลติ Omar)
