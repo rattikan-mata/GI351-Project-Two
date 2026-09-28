@@ -21,6 +21,11 @@ public class BossController : Monster
     [Header("Boss Info")]
     [Tooltip("ชื่อบอส (ใช้โชว์ใน Debug Log เฉยๆ ตอนนี้ ต่อยอดทำ UI ชื่อบอส/Health Bar ทีหลังได้)")]
     [SerializeField] private string bossName = "Boss";
+
+    
+    [Header("Exit Portal")]
+    [Tooltip("ประตูวาร์ปที่จะปรากฏขึ้นเมื่อบอสตัวนี้ตาย")]
+    [SerializeField] private GameObject exitPortal;
     #endregion
 
     #region Skill Rotation
@@ -338,6 +343,22 @@ public class BossController : Monster
         {
             spriteRenderer.color = originalColor;
         }
+    }
+
+    // เขียนทับฟังก์ชันตอนตายของ Monster
+    public override void Die()
+    {
+        if (isDead) return;
+
+        // สั่งเปิดประตูวาร์ป (ถ้ามีการตั้งค่าไว้ใน Inspector)
+        if (exitPortal != null)
+        {
+            exitPortal.SetActive(true);
+            Debug.Log("[Boss] บอสตายแล้ว! ประตูวาร์ปเปิดออก");
+        }
+
+        // เรียกใช้ระบบตายปกติของ Monster (ดรอปไอเทม และทำลายตัวเอง)
+        base.Die();
     }
 
     #region Debug Gizmos (เช็ค Hitbox แต่ละท่า)
