@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   itemName: Item
   icon: {fileID: 21300000, guid: 5ef45f5d4149eb84ea85d19364f07045, type: 3}
-  attackSprite: {fileID: -9038553283136271980, guid: b5abec94973549e4dabf1061ae1a03fe, type: 3}
+  attackSprite: {fileID: 21300000, guid: b5abec94973549e4dabf1061ae1a03fe, type: 3}
   attackSpriteDuration: 0.2
   matchAttackSpriteToEffectDuration: 1
   itemType: 8

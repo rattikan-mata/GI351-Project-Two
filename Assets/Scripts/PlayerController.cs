@@ -42,7 +42,11 @@ public class PlayerController : MonoBehaviour
     [Tooltip("จุดที่กระสุนจะถูกยิงออกมา (ลาก Empty child ตำแหน่งหน้าผู้เล่นมาใส่ ถ้าไม่ใส่จะยิงจากตัวผู้เล่นเอง)")]
     [SerializeField] private Transform firePoint;//จุดยิง
 
-    [SerializeField] private float firePointOffset = 0.5f;//ระยะห่างของจุดยิงจากตัวผู้เล่น
+    [SerializeField] private float firePointOffset = 0.5f;
+
+    
+    [SerializeField] private float bodyHeightOffset = 0.5f; // ขยับจุดศูนย์กลางขึ้นจากเท้ามาที่ระดับอก
+    public Vector2 CenterPosition => (Vector2)transform.position + new Vector2(0f, bodyHeightOffset);
 
     [SerializeField] private float projectileSpeed = 8f;//ความเร็วของกระสุน
     [SerializeField] private int projectileDamage = 10;//ดาเมจของกระสุน
@@ -564,11 +568,11 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    //ย้ายจุดยิงไปตามทิศที่ผู้เล่นหันอยู่ จะได้ยิงออกจากด้านหน้าเสมอ
     private void UpdateFirePointPosition()
     {
         if (firePoint == null) return;
-        firePoint.position = (Vector2)transform.position + GetFacingVector() * firePointOffset;
+       
+        firePoint.position = CenterPosition + GetFacingVector() * firePointOffset;
     }
 
     private Vector2 GetFacingVector()
@@ -652,7 +656,7 @@ public class PlayerController : MonoBehaviour
         while (Time.time - startTime < data.spinDuration && !isDead)
         {
             angle += data.spinRotationSpeed * Time.deltaTime;
-            Vector2 center = transform.position;
+            Vector2 center = (firePoint != null) ? firePoint.position : transform.position;
 
             for (int i = 0; i < bladeCount; i++)
             {
@@ -698,7 +702,7 @@ public class PlayerController : MonoBehaviour
     //ปรับจำนวนเป้าหมายได้ที่ ItemData.punchMaxTargets (1 = ตัวเดียว)
     private void UseMeleePunch(ItemData data)
     {
-        Vector2 playerPos = transform.position;
+        Vector2 playerPos = (firePoint != null) ? firePoint.position : transform.position;
         Vector2 origin = playerPos + GetFacingVector() * (data.meleeRange * 0.5f);
 
         // Debug: เห็นวงกลม hitbox จริงตอนต่อยใน Scene View เหมือนระบบของ BossController
