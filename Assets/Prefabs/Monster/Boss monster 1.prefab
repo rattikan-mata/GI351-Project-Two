@@ -161,7 +161,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -5899927303015767666, guid: 729789fab8ee96747a22c86a27d10572, type: 3}
+  m_Sprite: {fileID: 2007025658586607896, guid: 9f7fba3a94669b64183d4650770ab9f9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -237,7 +237,7 @@ PolygonCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.875, y: 1.9375}
+    oldSize: {x: 1.5625, y: 2}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -265,7 +265,7 @@ Animator:
   m_GameObject: {fileID: 3288230206911401485}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: f1fddd697912279449ec34684f583384, type: 2}
+  m_Controller: {fileID: 9100000, guid: da4b6552fa2b6ca479e5ad4b5e9ed56c, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -293,7 +293,8 @@ MonoBehaviour:
   moveSpeed: 3
   detectionRange: 15
   stoppingDistance: 0.6
-  spriteRenderer: {fileID: 0}
+  spriteRenderer: {fileID: 8355116657645598592}
+  anim: {fileID: 4917181424410279538}
   hitFlashDuration: 0.1
   stunColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   stunDuration: 1.5
