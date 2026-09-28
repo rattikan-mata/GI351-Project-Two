@@ -28,6 +28,8 @@ public class Monster : MonoBehaviour, IDamageable
     #region Hit Feedback (Optional Flash)
     [Header("Hit Feedback (Optional)")]
     [SerializeField] protected SpriteRenderer spriteRenderer;
+
+    [SerializeField] protected Animator anim;
     [SerializeField] protected float hitFlashDuration = 0.1f;
 
     protected Color originalColor; // เปิดเป็น protected ให้คลาสลูก (เช่น BossController) ใช้ตอนกระพริบสีเตือนท่าได้
@@ -163,6 +165,12 @@ public class Monster : MonoBehaviour, IDamageable
             {
                 spriteRenderer.flipX = false;
             }
+        }
+        if (anim != null)
+        {
+            // เช็คว่ามีความเร็วการเดินอยู่หรือไม่
+            bool moving = rb.linearVelocity.sqrMagnitude > 0.01f;
+            anim.SetBool("isMoving", moving);
         }
     }
 
