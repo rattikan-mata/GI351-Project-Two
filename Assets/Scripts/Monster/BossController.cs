@@ -198,6 +198,7 @@ public class BossController : Monster
             case BossSkill.Dash:
                 // โชว์วงกลมขนาด Dash Attack Range (ระยะที่บอสจะพุ่งชน) ให้เห็นตลอดช่วงเตือน+พุ่ง+พักฟื้นคร่าวๆ
                 SpawnAreaIndicator(transform.position, dashAttackRange, dashIndicatorColor, warningDuration + dashDuration + 0.3f);
+                AudioManager.Instance?.PlaySFX("boss_dash");
 
                 // ใช้ระบบพุ่งชนเดิมของ Monster ทั้งชุด (เตือนสีกระพริบ + พุ่ง + พักฟื้น) ไม่ต้องเขียนใหม่
                 yield return StartCoroutine(DashAttackRoutine());
@@ -244,6 +245,8 @@ public class BossController : Monster
 
         if (isDead || isStunned) yield break;
 
+        AudioManager.Instance?.PlaySFX("boss_shoot");
+
         for (int i = 0; i < count; i++)
         {
             GameObject projObj = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
@@ -283,6 +286,8 @@ public class BossController : Monster
         rb.linearVelocity = Vector2.zero;
 
         if (isDead || isStunned) yield break;
+
+        AudioManager.Instance?.PlaySFX("boss_slam");
 
         if (slamEffectPrefab != null)
         {

@@ -378,6 +378,7 @@ public class Monster : MonoBehaviour, IDamageable
 
         currentHP -= amount;
         PlayHitFlash();
+        AudioManager.Instance?.PlaySFX("monster_hurt");
 
         Debug.Log($"[Monster] โดนดาเมจ {amount} -> เลือดเหลือ {Mathf.Max(currentHP, 0)}/{maxHP}");
 

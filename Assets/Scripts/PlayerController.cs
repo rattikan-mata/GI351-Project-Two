@@ -16,6 +16,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Animator anim;
     [SerializeField] private SpriteRenderer spriteRenderer;
 
+    [Tooltip("ระยะเวลาระหว่างเสียงฝีเท้าแต่ละครั้งตอนเดิน (วินาที) ปรับให้เข้ากับจังหวะ Animation เดินของคุณ")]
+    [SerializeField] private float footstepInterval = 0.35f;
+    private float footstepTimer = 0f;
+
     private Rigidbody2D rb;
     private Vector2 moveInput;
     private Vector2 currentVelocity;
@@ -44,7 +48,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private float firePointOffset = 0.5f;
 
-    
+
     [SerializeField] private float bodyHeightOffset = 0.5f; // ขยับจุดศูนย์กลางขึ้นจากเท้ามาที่ระดับอก
     public Vector2 CenterPosition => (Vector2)transform.position + new Vector2(0f, bodyHeightOffset);
 
@@ -180,6 +184,7 @@ public class PlayerController : MonoBehaviour
             // Debug: โชว์ว่าหยิบอะไรมา เข้าช่องไหน durability เท่าไร
             Debug.Log($"[Player] หยิบไอเทม: {nearest.Data.itemName} (itemType = {nearest.Data.itemType}) เข้าช่อง {emptySlot + 1} durability = {nearest.CurrentDurability}/{nearest.Data.maxDurability}");
 
+            AudioManager.Instance?.PlaySFX("item_pickup");
             Destroy(nearest.gameObject);
         }
         else
@@ -201,6 +206,8 @@ public class PlayerController : MonoBehaviour
             // Debug: กระเป๋าเต็ม -> โชว์ว่าสลับอะไรกับอะไร ช่องไหน
             string leftName = itemToLeaveOnGround != null ? itemToLeaveOnGround.itemName : "(ช่องว่าง)";
             Debug.Log($"[Player] กระเป๋าเต็ม สลับของช่อง {activeSlotIndex + 1}: หยิบ {pickedUpItem.itemName} (itemType = {pickedUpItem.itemType}) durability {pickedUpDurability}/{pickedUpItem.maxDurability} ขึ้นมา, วาง {leftName} ทิ้งไว้แทน");
+
+            AudioManager.Instance?.PlaySFX("item_pickup");
         }
     }
 
@@ -224,6 +231,8 @@ public class PlayerController : MonoBehaviour
         {
             worldItem.Setup(itemToDrop, durabilityToDrop);
         }
+
+        AudioManager.Instance?.PlaySFX("item_drop");
     }
 
     /// <summary>
@@ -280,33 +289,41 @@ public class PlayerController : MonoBehaviour
         {
             case ItemData.ItemType.Ammo:
                 AddAmmo(item.amount);
+                AudioManager.Instance?.PlaySFX("ammo_pickup");
                 break;
             case ItemData.ItemType.HealPotion:
-                Heal(item.amount);
+                Heal(item.amount); // เสียงฮีลเล่นในเมธอด Heal() เอง (ใช้ร่วมกับ Heal Over Time ด้วย)
                 break;
             case ItemData.ItemType.TradeItem:
                 AddTradeItem(item.amount);
+                AudioManager.Instance?.PlaySFX("trade_item");
                 break;
             case ItemData.ItemType.SummonToken:
                 if (item.summonPrefab != null)
                 {
                     Instantiate(item.summonPrefab, (Vector2)transform.position + item.summonOffset, Quaternion.identity);
+                    AudioManager.Instance?.PlaySFX("summon");
                 }
                 break;
             case ItemData.ItemType.MeleeSpin:
                 used = UseMeleeSpin(item);
+                if (used) AudioManager.Instance?.PlaySFX("melee_spin");
                 break;
             case ItemData.ItemType.ShotgunArc:
                 used = UseShotgunArc(item);
+                if (used) AudioManager.Instance?.PlaySFX("shotgun_arc");
                 break;
             case ItemData.ItemType.SniperShot:
                 UseSniperShot(item);
+                AudioManager.Instance?.PlaySFX("sniper_shot");
                 break;
             case ItemData.ItemType.MeleePunch:
                 UseMeleePunch(item);
+                AudioManager.Instance?.PlaySFX("melee_punch");
                 break;
             case ItemData.ItemType.HealOverTime:
                 UseHealOverTime(item);
+                AudioManager.Instance?.PlaySFX("heal_over_time_start");
                 break;
         }
 
@@ -444,6 +461,7 @@ public class PlayerController : MonoBehaviour
 
         summonItemCount--;
         Instantiate(pendingSummonPrefab, (Vector2)transform.position + pendingSummonOffset, Quaternion.identity);
+        AudioManager.Instance?.PlaySFX("summon");
         Debug.Log($"[Player] ใช้ไอเทม summon -> เหลือ {summonItemCount} ชิ้น"); //debug ดูไอเทม summon ที่เหลือตอนกดใช้
     }
     #endregion
@@ -521,6 +539,22 @@ public class PlayerController : MonoBehaviour
             // sqrMagnitude > 0 หมายถึงมีการกดปุ่มทิศทางอยู่ (ความเร็วไม่เป็น 0)
             anim.SetBool("isMoving", moveInput.sqrMagnitude > 0);
         }
+
+        // เสียงฝีเท้า: เดินอยู่ -> นับเวลาถอยหลัง ครบ footstepInterval ค่อยเล่นเสียงแล้วรีเซ็ตนับใหม่
+        // หยุดเดิน -> รีเซ็ตตัวจับเวลา จะได้เล่นเสียงทันทีตั้งแต่ก้าวแรกตอนเริ่มเดินรอบถัดไป
+        if (moveInput.sqrMagnitude > 0f && !isKnockedBack)
+        {
+            footstepTimer -= Time.deltaTime;
+            if (footstepTimer <= 0f)
+            {
+                AudioManager.Instance?.PlaySFX("player_walk");
+                footstepTimer = footstepInterval;
+            }
+        }
+        else
+        {
+            footstepTimer = 0f;
+        }
     }
 
     private void UpdateFacingToMouse()
@@ -571,7 +605,7 @@ public class PlayerController : MonoBehaviour
     private void UpdateFirePointPosition()
     {
         if (firePoint == null) return;
-       
+
         firePoint.position = CenterPosition + GetFacingVector() * firePointOffset;
     }
 
@@ -610,6 +644,8 @@ public class PlayerController : MonoBehaviour
         {
             projectile.Init(GetFacingVector(), projectileSpeed, projectileDamage, projectileRange);
         }
+
+        AudioManager.Instance?.PlaySFX("player_shoot");
     }
 
     // ระบบเติมกระสุนให้ผู้เล่น (สามารถเรียกจาก Item Pickup ได้)
@@ -929,6 +965,7 @@ public class PlayerController : MonoBehaviour
         invincibleUntil = Time.time + invincibilityDuration;
 
         Debug.Log($"[Player] โดนดาเมจ {amount} -> เลือดเหลือ {Mathf.Max(currentHP, 0)}/{maxHP}");
+        AudioManager.Instance?.PlaySFX("player_hurt");
 
         if (currentHP <= 0)
         {
@@ -942,6 +979,7 @@ public class PlayerController : MonoBehaviour
         if (isDead) return;
         currentHP = Mathf.Min(currentHP + amount, maxHP);
         Debug.Log($"[Player] ฮีล +{amount} -> เลือดเหลือ {currentHP}/{maxHP}"); //debug ดูเลือดหลังฮีล
+        AudioManager.Instance?.PlaySFX("player_heal");
     }
 
     private void Die()
@@ -949,6 +987,7 @@ public class PlayerController : MonoBehaviour
         isDead = true;
         currentVelocity = Vector2.zero;
         Debug.Log("[Player] Died.");
+        AudioManager.Instance?.PlaySFX("player_die");
     }
     #endregion
 }
