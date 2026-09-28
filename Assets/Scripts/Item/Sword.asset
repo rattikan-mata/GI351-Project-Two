@@ -38,7 +38,7 @@ MonoBehaviour:
   spinBladeCount: 3
   spinBladeHitRadius: 0.5
   spinHitInterval: 0.5
-  spinBladePrefab: {fileID: 7194281834610975454, guid: f93c9abf2450f2d458eb57dcccc24b6b, type: 3}
+  spinBladePrefab: {fileID: 8908638212447153639, guid: 550bc6b259e41424abad55f44440a908, type: 3}
   arcProjectilePrefab: {fileID: 0}
   arcProjectileSpeed: 0
   arcAngle: 0
