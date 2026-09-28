@@ -173,4 +173,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
   targetLayer:
     serializedVersion: 2
-    m_Bits: 72
+    m_Bits: 8
+  pierceThroughTargets: 0
+  maxPierceCount: -1

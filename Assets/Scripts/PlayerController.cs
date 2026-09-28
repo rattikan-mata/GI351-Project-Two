@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -13,11 +14,19 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 4f;
     [SerializeField] private Animator anim;
-    [SerializeField] private SpriteRenderer spriteRenderer; 
+    [SerializeField] private SpriteRenderer spriteRenderer;
 
     private Rigidbody2D rb;
     private Vector2 moveInput;
     private Vector2 currentVelocity;
+
+    // ใช้สลับสไปรต์ตัวผู้เล่นทั้งตัวเป็นท่าโจมตี (แบบ Terraria) ตอนกดใช้ไอเทม แล้วสลับกลับเองอัตโนมัติ
+    private Coroutine attackSpriteCoroutine;
+
+    // สถานะ "ก่อนเริ่มโจมตีจริงๆ" จำไว้แค่ครั้งเดียวตอนไม่มี attack sprite ค้างอยู่ (กันบัคตอนกดรัว
+    // ที่เดิมจะไปจำสถานะที่ถูกท่าโจมตีเขียนทับไปแล้วซ้ำๆ จนคืนค่าผิดตอนจบ)
+    private bool animatorWasEnabledBeforeAttack = true;
+    private Sprite spriteBeforeAnyAttack;
 
     public FacingDirection CurrentFacing { get; private set; } = FacingDirection.Down;
     #endregion
@@ -33,7 +42,11 @@ public class PlayerController : MonoBehaviour
     [Tooltip("จุดที่กระสุนจะถูกยิงออกมา (ลาก Empty child ตำแหน่งหน้าผู้เล่นมาใส่ ถ้าไม่ใส่จะยิงจากตัวผู้เล่นเอง)")]
     [SerializeField] private Transform firePoint;//จุดยิง
 
-    [SerializeField] private float firePointOffset = 0.5f;//ระยะห่างของจุดยิงจากตัวผู้เล่น
+    [SerializeField] private float firePointOffset = 0.5f;
+
+    
+    [SerializeField] private float bodyHeightOffset = 0.5f; // ขยับจุดศูนย์กลางขึ้นจากเท้ามาที่ระดับอก
+    public Vector2 CenterPosition => (Vector2)transform.position + new Vector2(0f, bodyHeightOffset);
 
     [SerializeField] private float projectileSpeed = 8f;//ความเร็วของกระสุน
     [SerializeField] private int projectileDamage = 10;//ดาเมจของกระสุน
@@ -118,6 +131,12 @@ public class PlayerController : MonoBehaviour
     private InventorySlotData[] inventorySlots;
     private int activeSlotIndex = 0;
     private float lastItemUseTime = -999f;
+
+    // สถานะของสกิลที่ทำงานต่อเนื่อง (มีดพร้าหมุน / ข้าวสารสาดหลายเวฟ)
+    private bool isSpinActive = false;       // มีดพร้ากำลังหมุนอยู่ -> กดซ้ำไม่ได้
+    private bool isRiceCastActive = false;   // ข้าวสารกำลังสาดอยู่ -> กดซ้ำไม่ได้
+    private bool facingLocked = false;       // ล็อกทิศหันหน้า (ข้าวสาร: หันหน้าไม่ได้ระหว่างสาด)
+    private bool movementLocked = false;     // ล็อกการเดิน (เปิด/ปิดได้ใน ItemData)
 
     public InventorySlotData[] InventorySlots => inventorySlots; // ให้ UI กระเป๋าไปอ่านค่าต่อยอดทีหลังได้
     public int ActiveSlotIndex => activeSlotIndex;
@@ -222,9 +241,10 @@ public class PlayerController : MonoBehaviour
         if (item == null) return; // ช่องว่าง ไม่มีอะไรให้ใช้
 
         if (Time.time - lastItemUseTime < item.useCooldown) return;
-        lastItemUseTime = Time.time;
 
-        ApplyItemEffect(item);
+        // ใช้ไม่สำเร็จ (เช่น สกิลเดิมยังทำงานอยู่ / ไม่มี Prefab) -> ไม่เสียความคงทน และไม่เข้าคูลดาวน์
+        if (!ApplyItemEffect(item)) return;
+        lastItemUseTime = Time.time;
 
         if (item.maxDurability > 0)
         {
@@ -249,10 +269,12 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void ApplyItemEffect(ItemData item)
+    private bool ApplyItemEffect(ItemData item)
     {
         // Debug: โชว์ทุกครั้งที่กดใช้ไอเทม ว่าเป็นไอเทมอะไร ตั้ง itemType เป็นอะไร ช่วยจับกรณีตั้ง itemType ผิดใน asset
         Debug.Log($"[Player] กดใช้ไอเทม: {item.itemName} (itemType = {item.itemType})");
+
+        bool used = true;
 
         switch (item.itemType)
         {
@@ -272,10 +294,10 @@ public class PlayerController : MonoBehaviour
                 }
                 break;
             case ItemData.ItemType.MeleeSpin:
-                UseMeleeSpin(item);
+                used = UseMeleeSpin(item);
                 break;
             case ItemData.ItemType.ShotgunArc:
-                UseShotgunArc(item);
+                used = UseShotgunArc(item);
                 break;
             case ItemData.ItemType.SniperShot:
                 UseSniperShot(item);
@@ -287,6 +309,16 @@ public class PlayerController : MonoBehaviour
                 UseHealOverTime(item);
                 break;
         }
+
+        // สลับสไปรต์ตัวผู้เล่นเป็นท่าโจมตีเฉพาะตอนที่ใช้ "สำเร็จจริง" เท่านั้น
+        // (สำคัญ: ถ้าเรียกไว้ก่อนเช็คผลลัพธ์ สแปมกดตอนสกิลเดิมยังทำงานอยู่ เช่น มีดพร้ากำลังหมุน/ข้าวสารกำลังสาด
+        // จะไปรีสตาร์ตนับเวลาโชว์สไปรต์ใหม่ทุกครั้งที่กด ทำให้สไปรต์ไม่มีวันกลับเป็นปกติ)
+        if (used)
+        {
+            PlayAttackSpriteIfAny(item);
+        }
+
+        return used;
     }
 
     private WorldItem FindNearestGroundItem()
@@ -317,6 +349,70 @@ public class PlayerController : MonoBehaviour
             if (inventorySlots[i].item == null) return i;
         }
         return -1;
+    }
+
+    /// <summary>
+    /// สลับสไปรต์ตัวผู้เล่นทั้งตัวเป็นท่าโจมตี (เช่น ท่าถือมีดพร้า) ชั่วคราวแบบ Terraria
+    /// ถ้า item.attackSprite ไม่ได้ตั้งไว้ จะไม่ทำอะไรเลย (ใช้สไปรต์ปกติของ Animator ต่อไปตามเดิม)
+    /// </summary>
+    private void PlayAttackSpriteIfAny(ItemData item)
+    {
+        if (item.attackSprite == null || spriteRenderer == null) return;
+
+        // จำสถานะเดิมแค่ตอน "เริ่มโจมตีจริงๆ" (ยังไม่มี attack sprite ค้างอยู่) เท่านั้น
+        // กันบัคตอนกดรัว: ถ้ากดซ้ำระหว่างที่ยังโชว์ท่าโจมตีค้างอยู่ จะไม่จำสถานะที่ถูกเขียนทับไปแล้วซ้ำ
+        if (attackSpriteCoroutine == null)
+        {
+            if (anim != null) animatorWasEnabledBeforeAttack = anim.enabled;
+            spriteBeforeAnyAttack = spriteRenderer.sprite;
+        }
+
+        if (attackSpriteCoroutine != null) StopCoroutine(attackSpriteCoroutine);
+
+        float duration = GetAttackSpriteDuration(item);
+        attackSpriteCoroutine = StartCoroutine(ShowAttackSpriteRoutine(item.attackSprite, duration));
+    }
+
+    /// <summary>
+    /// ระยะเวลาที่จะโชว์ Attack Sprite: ถ้า item ติ๊ก Match Attack Sprite To Effect Duration ไว้
+    /// จะยืดตามเวลาที่สกิลนั้นทำงานจริง (มีดพร้า = Spin Duration / ข้าวสารเสก = Arc Cast Duration ทั้งหมด)
+    /// ไม่ติ๊ก หรือเป็นชนิดอื่น -> ใช้ Attack Sprite Duration ตามปกติ
+    /// </summary>
+    private float GetAttackSpriteDuration(ItemData item)
+    {
+        if (!item.matchAttackSpriteToEffectDuration) return item.attackSpriteDuration;
+
+        switch (item.itemType)
+        {
+            case ItemData.ItemType.MeleeSpin: return item.spinDuration;
+            case ItemData.ItemType.ShotgunArc: return item.arcCastDuration;
+            default: return item.attackSpriteDuration;
+        }
+    }
+
+    private IEnumerator ShowAttackSpriteRoutine(Sprite atkSprite, float duration)
+    {
+        bool hasAnimator = anim != null;
+
+        // ปิด Animator ชั่วคราว กันมันเขียนทับสไปรต์ที่เราสั่งโชว์ทุกเฟรม
+        if (hasAnimator) anim.enabled = false;
+
+        spriteRenderer.sprite = atkSprite;
+
+        yield return new WaitForSeconds(duration);
+
+        if (hasAnimator)
+        {
+            // คืนค่าตามสถานะจริงก่อนเริ่มโจมตีครั้งแรก (ไม่ใช่ค่าที่แอบเป็น false จากการกดซ้อนระหว่างทาง)
+            anim.enabled = animatorWasEnabledBeforeAttack;
+        }
+        else
+        {
+            // ไม่มี Animator -> คืนสไปรต์ตัวจริงก่อนเริ่มโจมตีครั้งแรก (ไม่ใช่สไปรต์ท่าโจมตีที่ค้างจากการกดซ้อน)
+            spriteRenderer.sprite = spriteBeforeAnyAttack;
+        }
+
+        attackSpriteCoroutine = null;
     }
     #endregion
 
@@ -416,6 +512,7 @@ public class PlayerController : MonoBehaviour
 
         // เดินทแยงได้
         moveInput = new Vector2(h, v);
+        if (movementLocked) moveInput = Vector2.zero; // ล็อกการเดินระหว่างสกิล (ถ้าเปิดไว้)
         currentVelocity = moveInput.normalized * moveSpeed;
 
         // ++ เพิ่มบล็อกโค้ดด้านล่างนี้ เพื่อสั่งเปิด/ปิด อนิเมชั่นเดิน ++
@@ -429,6 +526,13 @@ public class PlayerController : MonoBehaviour
     private void UpdateFacingToMouse()
     {
         if (Camera.main == null) return;
+
+        // ระหว่างข้าวสารกำลังสาด (หันหน้าไม่ได้) -> คงทิศเดิมไว้ ไม่อัปเดตตามเมาส์
+        if (facingLocked)
+        {
+            UpdateFirePointPosition();
+            return;
+        }
 
         // ตัวแปรถูกประกาศและคำนวณไว้ตรงนี้แล้ว
         Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -464,11 +568,11 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    //ย้ายจุดยิงไปตามทิศที่ผู้เล่นหันอยู่ จะได้ยิงออกจากด้านหน้าเสมอ
     private void UpdateFirePointPosition()
     {
         if (firePoint == null) return;
-        firePoint.position = (Vector2)transform.position + GetFacingVector() * firePointOffset;
+       
+        firePoint.position = CenterPosition + GetFacingVector() * firePointOffset;
     }
 
     private Vector2 GetFacingVector()
@@ -518,50 +622,208 @@ public class PlayerController : MonoBehaviour
 
     #region Weapon Use Logic (ตรรกะเฉพาะของอาวุธ/ไอเทมทั้ง 5 ชนิด)
 
-    //มีดพร้า: หมุนรอบตัว ทำดาเมจ AoE รอบตัวทันทีตอนกดใช้
-    private void UseMeleeSpin(ItemData data)
+    //มีดพร้า (สไตล์อัลติ Omar): ดาบหมุนวนรอบตัวต่อเนื่องหลายวินาที โดนมอนตัวไหนก็ตีตัวนั้น
+    //ทุกค่าปรับได้ใน ItemData: spinDuration / spinRotationSpeed / spinBladeCount / spinRadius / spinBladeHitRadius / spinHitInterval
+    private bool UseMeleeSpin(ItemData data)
     {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, data.spinRadius, monsterLayer);
-
-        foreach (var hit in hits)
-        {
-            if (hit.TryGetComponent<Monster>(out var monster))
-            {
-                monster.TakeDamage(data.damage);
-
-                Vector2 dir = ((Vector2)monster.transform.position - (Vector2)transform.position).normalized;
-                monster.ApplyKnockback(dir, data.knockbackForce);
-
-                if (data.stunDuration > 0f) monster.ApplyStun(data.stunDuration);
-            }
-        }
+        if (isSpinActive) return false; // กำลังหมุนอยู่ ใช้ซ้อนไม่ได้
+        StartCoroutine(SpinBladesRoutine(data));
+        return true;
     }
 
-    //หมัดพระ: ตีตรงหน้าในระยะสั้น ผลักมอนกระเดน แต่ไม่มีสตัน (ตามที่ต้องการ)
+    private IEnumerator SpinBladesRoutine(ItemData data)
+    {
+        isSpinActive = true;
+
+        int bladeCount = Mathf.Max(1, data.spinBladeCount);
+
+        // ตัวโชว์ภาพดาบ (ไม่ใส่ Prefab ก็ยังตีได้ แค่ไม่มีภาพ) ผูกเป็นลูกของผู้เล่น จะได้ไม่ค้างถ้าผู้เล่นถูกลบ
+        GameObject[] visuals = new GameObject[bladeCount];
+        if (data.spinBladePrefab != null)
+        {
+            for (int i = 0; i < bladeCount; i++)
+            {
+                visuals[i] = Instantiate(data.spinBladePrefab, transform.position, Quaternion.identity, transform);
+            }
+        }
+
+        // จำเวลาที่ตีมอนแต่ละตัวล่าสุด เพื่อให้ตีซ้ำได้ทุก spinHitInterval วินาที (ไม่ตีรัวทุกเฟรม)
+        var lastHitTime = new Dictionary<Monster, float>();
+
+        float startTime = Time.time;
+        float angle = 0f;
+
+        while (Time.time - startTime < data.spinDuration && !isDead)
+        {
+            angle += data.spinRotationSpeed * Time.deltaTime;
+            Vector2 center = (firePoint != null) ? firePoint.position : transform.position;
+
+            for (int i = 0; i < bladeCount; i++)
+            {
+                float a = angle + (360f / bladeCount) * i;
+                Vector2 offset = new Vector2(Mathf.Cos(a * Mathf.Deg2Rad), Mathf.Sin(a * Mathf.Deg2Rad)) * data.spinRadius;
+                Vector2 bladePos = center + offset;
+
+                if (visuals[i] != null)
+                {
+                    visuals[i].transform.position = bladePos;
+                    visuals[i].transform.rotation = Quaternion.Euler(0f, 0f, a);
+                }
+
+                Collider2D[] hits = Physics2D.OverlapCircleAll(bladePos, data.spinBladeHitRadius, monsterLayer);
+                foreach (var hit in hits)
+                {
+                    if (!hit.TryGetComponent<Monster>(out var monster)) continue;
+
+                    if (lastHitTime.TryGetValue(monster, out float lastTime) && Time.time - lastTime < data.spinHitInterval) continue;
+                    lastHitTime[monster] = Time.time;
+
+                    monster.TakeDamage(data.damage);
+
+                    Vector2 dir = ((Vector2)monster.transform.position - center).normalized;
+                    monster.ApplyKnockback(dir, data.knockbackForce);
+
+                    if (data.stunDuration > 0f) monster.ApplyStun(data.stunDuration);
+                }
+            }
+
+            yield return null;
+        }
+
+        for (int i = 0; i < bladeCount; i++)
+        {
+            if (visuals[i] != null) Destroy(visuals[i]);
+        }
+
+        isSpinActive = false;
+    }
+
+    //หมัดพระ: ตีตรงหน้าในระยะสั้น โดนได้แค่ตัวเดียว (ตัวที่ใกล้ผู้เล่นที่สุดในระยะ) ไม่มีดาเมจหมู่
+    //ปรับจำนวนเป้าหมายได้ที่ ItemData.punchMaxTargets (1 = ตัวเดียว)
     private void UseMeleePunch(ItemData data)
     {
-        Vector2 origin = (Vector2)transform.position + GetFacingVector() * (data.meleeRange * 0.5f);
+        Vector2 playerPos = (firePoint != null) ? firePoint.position : transform.position;
+        Vector2 origin = playerPos + GetFacingVector() * (data.meleeRange * 0.5f);
+
+        // Debug: เห็นวงกลม hitbox จริงตอนต่อยใน Scene View เหมือนระบบของ BossController
+        // (เช็คว่าระยะที่ตีโดนจริงตรงกับ Melee Range ที่ตั้งใน ItemData ไหม)
+        DrawDebugCircle(origin, data.meleeRange, Color.yellow, 0.3f);
+
+        // ภาพจริงที่เห็นในเกม (ไม่ใช่แค่ debug): สปอน Sprite hitbox ถ้าตั้ง Punch Indicator Prefab ไว้ใน ItemData
+        SpawnAreaIndicator(origin, data.meleeRange, data.punchIndicatorColor, data.punchIndicatorDuration, data.punchIndicatorPrefab);
+
         Collider2D[] hits = Physics2D.OverlapCircleAll(origin, data.meleeRange, monsterLayer);
 
+        // รวบรวมมอนที่อยู่ในระยะ (กันซ้ำกรณีมอนตัวเดียวมีหลาย Collider)
+        var targets = new List<Monster>();
         foreach (var hit in hits)
         {
-            if (hit.TryGetComponent<Monster>(out var monster))
+            if (hit.TryGetComponent<Monster>(out var monster) && !targets.Contains(monster))
             {
-                monster.TakeDamage(data.damage);
-
-                Vector2 dir = ((Vector2)monster.transform.position - (Vector2)transform.position).normalized;
-                monster.ApplyKnockback(dir, data.knockbackForce);
-                //ตั้งใจไม่เรียก ApplyStun ตรงนี้ -> หมัดพระเอาสตันออกตามที่ต้องการ
+                targets.Add(monster);
             }
+        }
+
+        // เรียงจากใกล้ผู้เล่นที่สุดไปไกลสุด
+        targets.Sort((a, b) =>
+            ((Vector2)a.transform.position - playerPos).sqrMagnitude
+            .CompareTo(((Vector2)b.transform.position - playerPos).sqrMagnitude));
+
+        int count = Mathf.Min(Mathf.Max(1, data.punchMaxTargets), targets.Count);
+        for (int i = 0; i < count; i++)
+        {
+            Monster monster = targets[i];
+            monster.TakeDamage(data.damage);
+
+            Vector2 dir = ((Vector2)monster.transform.position - playerPos).normalized;
+            monster.ApplyKnockback(dir, data.knockbackForce);
+            //ตั้งใจไม่เรียก ApplyStun ตรงนี้ -> หมัดพระเอาสตันออกตามที่ต้องการ
         }
     }
 
-    //ข้าวสารเสก: ยิงกระจายเป็นมุม (arc) เหมือน Shotgun ปรับมุม/ระยะ/จำนวนนัดได้จาก ItemData
-    private void UseShotgunArc(ItemData data)
+    // วาดวงกลมด้วย Debug.DrawLine ให้เห็น hitbox จริงตอน Play (เหมือนของ BossController.cs)
+    // เห็นเฉพาะใน Scene View ตอนรัน Play Mode เท่านั้น ไม่โชว์ในเกมจริงตอน build
+    private void DrawDebugCircle(Vector2 center, float radius, Color color, float duration, int segments = 24)
     {
-        if (data.arcProjectilePrefab == null) return;
+        if (radius <= 0f) return;
 
-        Vector2 baseDir = GetFacingVector();
+        Vector3 prevPoint = center + new Vector2(radius, 0f);
+        for (int i = 1; i <= segments; i++)
+        {
+            float angle = (360f / segments) * i * Mathf.Deg2Rad;
+            Vector3 nextPoint = center + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * radius;
+            Debug.DrawLine(prevPoint, nextPoint, color, duration);
+            prevPoint = nextPoint;
+        }
+    }
+
+    // สปอนวัตถุโชว์ hitbox จริงชั่วคราว (เห็นในเกมจริง ไม่ใช่แค่ Debug) ปรับขนาดอัตโนมัติตามรัศมีที่ต้องการ
+    // ใช้ได้กับ Sprite รูปอะไรก็ได้ (วงกลม สี่เหลี่ยม ฯลฯ) เพราะสเกลตาม sprite.bounds.size.x ให้เส้นผ่านศูนย์กลาง = radius x 2 เสมอ
+    // เทคนิคเดียวกับ SpawnAreaIndicator ของ BossController.cs
+    private void SpawnAreaIndicator(Vector3 position, float radius, Color tint, float duration, GameObject indicatorPrefab)
+    {
+        if (indicatorPrefab == null || radius <= 0f) return;
+
+        GameObject obj = Instantiate(indicatorPrefab, position, Quaternion.identity);
+
+        if (obj.TryGetComponent<SpriteRenderer>(out var sr))
+        {
+            sr.color = tint;
+
+            float nativeWidth = (sr.sprite != null) ? sr.sprite.bounds.size.x : 1f;
+            if (nativeWidth > 0.0001f)
+            {
+                float scale = (radius * 2f) / nativeWidth; // รัศมี x 2 = เส้นผ่านศูนย์กลางที่ต้องการ
+                obj.transform.localScale = new Vector3(scale, scale, 1f);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[Player] Punch Indicator Prefab ไม่มี SpriteRenderer -> ปรับขนาดอัตโนมัติไม่ได้", obj);
+        }
+
+        Destroy(obj, duration);
+    }
+
+    //ข้าวสารเสก (สไตล์อัลติ Capheny): สาดเป็นเวฟๆ ต่อเนื่อง ระหว่างสาดหันหน้าไม่ได้ (ทิศล็อกตั้งแต่ตอนกด)
+    //ปรับได้ใน ItemData: arcWavesPerSecond / arcCastDuration / arcAngle / pelletCount / arcRange / arcLockFacing / arcLockMovement
+    private bool UseShotgunArc(ItemData data)
+    {
+        if (data.arcProjectilePrefab == null) return false;
+        if (isRiceCastActive) return false; // กำลังสาดอยู่ ใช้ซ้อนไม่ได้
+
+        StartCoroutine(ShotgunArcRoutine(data));
+        return true;
+    }
+
+    private IEnumerator ShotgunArcRoutine(ItemData data)
+    {
+        isRiceCastActive = true;
+
+        Vector2 lockedDir = GetFacingVector(); // จำทิศตอนกดใช้
+        if (data.arcLockFacing) facingLocked = true;
+        if (data.arcLockMovement) movementLocked = true;
+
+        float wavesPerSecond = Mathf.Max(0.01f, data.arcWavesPerSecond);
+        float interval = 1f / wavesPerSecond;
+        int totalWaves = Mathf.Max(1, Mathf.RoundToInt(wavesPerSecond * data.arcCastDuration));
+
+        // เช่น 2 เวฟ/วิ x 2 วิ = 4 เวฟ (ที่ 0, 0.5, 1.0, 1.5 วิ) แล้วปลดล็อกตอนครบ 2 วิ
+        for (int w = 0; w < totalWaves && !isDead; w++)
+        {
+            Vector2 dir = data.arcLockFacing ? lockedDir : GetFacingVector();
+            FireArcWave(data, dir);
+            yield return new WaitForSeconds(interval);
+        }
+
+        facingLocked = false;
+        movementLocked = false;
+        isRiceCastActive = false;
+    }
+
+    // ยิง 1 เวฟ: กระสุนกระจายเป็นมุมเหมือน Shotgun
+    private void FireArcWave(ItemData data, Vector2 baseDir)
+    {
         float baseAngle = Mathf.Atan2(baseDir.y, baseDir.x) * Mathf.Rad2Deg;
 
         int count = Mathf.Max(1, data.pelletCount);
@@ -582,7 +844,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    //หนังสติ๊: ยิงตรงระยะไกล เหมือน Sniper
+    //หนังสติ๊ก: ยิงลูกระเบิดตรงไปข้างหน้า ชนแล้วระเบิด + มีกระสุนกระจายออกมา (ดูรายละเอียดใน GrenadeProjectile.cs)
     private void UseSniperShot(ItemData data)
     {
         if (data.sniperProjectilePrefab == null) return;
@@ -590,8 +852,13 @@ public class PlayerController : MonoBehaviour
         Vector3 spawnPos = (firePoint != null) ? firePoint.position : transform.position;
         GameObject projObj = Instantiate(data.sniperProjectilePrefab, spawnPos, Quaternion.identity);
 
-        if (projObj.TryGetComponent<Projectile>(out var projectile))
+        if (projObj.TryGetComponent<GrenadeProjectile>(out var grenade))
         {
+            grenade.Init(GetFacingVector(), data);
+        }
+        else if (projObj.TryGetComponent<Projectile>(out var projectile))
+        {
+            // เผื่อ Prefab เดิมที่ยังเป็น Projectile ธรรมดา -> ยิงตรงแบบเดิม
             projectile.Init(GetFacingVector(), data.sniperSpeed, data.damage, data.sniperRange);
         }
     }

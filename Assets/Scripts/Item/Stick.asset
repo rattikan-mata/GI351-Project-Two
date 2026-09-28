@@ -14,6 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   itemName: Item
   icon: {fileID: 94058731202090889, guid: 5738f697d62538c4296acacf15f99c0b, type: 3}
+  attackSprite: {fileID: 21300000, guid: 38bfe255aecb53b4b9ca10a650889b3c, type: 3}
+  attackSpriteDuration: 0.2
+  matchAttackSpriteToEffectDuration: 1
   itemType: 6
   amount: 1
   summonPrefab: {fileID: 0}
@@ -25,15 +28,41 @@ MonoBehaviour:
   knockbackForce: 6
   stunDuration: 0
   meleeRange: 0
+  punchMaxTargets: 0
+  punchIndicatorPrefab: {fileID: 0}
+  punchIndicatorColor: {r: 1, g: 1, b: 0, a: 0.5}
+  punchIndicatorDuration: 0.15
   spinRadius: 0
+  spinDuration: 0
+  spinRotationSpeed: 0
+  spinBladeCount: 0
+  spinBladeHitRadius: 0
+  spinHitInterval: 0
+  spinBladePrefab: {fileID: 0}
   arcProjectilePrefab: {fileID: 0}
   arcProjectileSpeed: 0
   arcAngle: 0
   pelletCount: 0
   arcRange: 0
-  sniperProjectilePrefab: {fileID: 2270187744293289748, guid: cbba1a09de8843d44af095b8522b1615, type: 3}
+  arcWavesPerSecond: 0
+  arcCastDuration: 0
+  arcLockFacing: 0
+  arcLockMovement: 0
+  sniperProjectilePrefab: {fileID: 1643082123348804430, guid: 711f39ed7a2d7be47a74b96afec749b6, type: 3}
   sniperSpeed: 20
   sniperRange: 15
-  healTotalAmount: 30
-  healDuration: 5
-  healTickInterval: 0.5
+  explosionRadius: 2
+  explodeAtMaxRange: 1
+  explosionEffectPrefab: {fileID: 0}
+  explosionEffectLifetime: 1.5
+  fragmentPrefab: {fileID: 2270187744293289748, guid: 57e06cd8a60fea34a891946e1bd436a3, type: 3}
+  fragmentCount: 8
+  fragmentSpeed: 10
+  fragmentRange: 4
+  fragmentDamage: 5
+  fragmentAngleOffset: 0
+  fragmentSpawnOffset: 0.2
+  fragmentsIgnoreDirectTarget: 1
+  healTotalAmount: 0
+  healDuration: 0
+  healTickInterval: 0

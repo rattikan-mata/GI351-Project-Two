@@ -363,7 +363,17 @@ MonoBehaviour:
   stunColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   stunDuration: 1.5
   knockbackDuration: 0.15
-  dropChance: 0.3
+  dropChance: 1
+  worldItemPrefab: {fileID: 7194281834610975454, guid: f93c9abf2450f2d458eb57dcccc24b6b, type: 3}
+  dropTable:
+  - item: {fileID: 11400000, guid: f5cb365cbbb268446befdbf19528d9a7, type: 2}
+    weight: 1
+  - item: {fileID: 11400000, guid: 3a96daef2844e604fa0264a565564e3e, type: 2}
+    weight: 1
+  - item: {fileID: 11400000, guid: 445a0b1ca03389c43afb72a3bce3a2e5, type: 2}
+    weight: 1
+  - item: {fileID: 11400000, guid: 2f676423b679ee1408567e8eaadb409c, type: 2}
+    weight: 1
   dropItemPrefab: {fileID: 0}
   contactDamage: 5
   attackCooldown: 1
