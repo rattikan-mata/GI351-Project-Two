@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7016222257066243927}
   - component: {fileID: 6776986437145526869}
   m_Layer: 0
-  m_Name: Bullet
+  m_Name: Rice
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -84,7 +84,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: ac374b545d6b7e749b623b727dd85332, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 51af2d179af4b734e9e49b57ba5ae7b0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
