@@ -1060,6 +1060,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Tanee
       objectReference: {fileID: 0}
+    - target: {fileID: 8355116657645598592, guid: 76889eda1f275374e9f9d8fe5353aeab, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8954104110159911395, guid: 76889eda1f275374e9f9d8fe5353aeab, type: 3}
       propertyPath: m_LocalPosition.x
       value: -35.838528
@@ -55701,7 +55705,7 @@ TilemapRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: -2
   m_MaskInteraction: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
