@@ -442,6 +442,8 @@ public class Monster : MonoBehaviour, IDamageable
     {
         isAttacking = true;
 
+        AudioManager.Instance?.PlaySFX("monster_detect");
+
         float elapsed = 0f;
         bool toggleColor = false;
 
@@ -467,6 +469,9 @@ public class Monster : MonoBehaviour, IDamageable
         {
             Vector2 dashDirection = ((Vector2)playerTransform.position - rb.position).normalized;
             float dashTime = 0f;
+
+            // 2. เติมเสียงตอนเริ่มพุ่งชน (แดช) ตรงนี้
+            AudioManager.Instance?.PlaySFX("monster_dash");
 
             isDashing = true;
             while (dashTime < dashDuration)
