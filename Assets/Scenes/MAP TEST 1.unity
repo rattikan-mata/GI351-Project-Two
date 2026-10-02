@@ -3913,15 +3913,15 @@ MonoBehaviour:
     randomizePitch: 0
     pitchVariance: 0
   - id: monster_detect
-    clip: {fileID: 0}
-    volume: 0
-    pitch: 0
+    clip: {fileID: 8300000, guid: cb5b9550e569e2b4cb4ff941876942f6, type: 3}
+    volume: 0.377
+    pitch: 1
     randomizePitch: 0
     pitchVariance: 0
   - id: monster_dash
-    clip: {fileID: 0}
-    volume: 0
-    pitch: 0
+    clip: {fileID: 8300000, guid: b1970f330e5f805409f889670fa7bed0, type: 3}
+    volume: 0.296
+    pitch: 1
     randomizePitch: 0
     pitchVariance: 0
   - id: monster_hurt
