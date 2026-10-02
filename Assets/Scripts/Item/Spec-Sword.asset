@@ -16,7 +16,7 @@ MonoBehaviour:
   icon: {fileID: 3106341853739790030, guid: 5738f697d62538c4296acacf15f99c0b, type: 3}
   attackSprite: {fileID: 21300000, guid: 4dfc9c8ce3736ba44a8234f37a68c9fc, type: 3}
   attackSpriteDuration: 0.2
-  matchAttackSpriteToEffectDuration: 1
+  matchAttackSpriteToEffectDuration: 0
   itemType: 4
   amount: 1
   summonPrefab: {fileID: 0}
@@ -25,14 +25,14 @@ MonoBehaviour:
   durabilityLossPerUse: 1
   useCooldown: 0.5
   damage: 5
-  knockbackForce: 6
+  knockbackForce: 8
   stunDuration: 0
   meleeRange: 0
   punchMaxTargets: 0
   punchIndicatorPrefab: {fileID: 0}
   punchIndicatorColor: {r: 1, g: 1, b: 0, a: 0.5}
   punchIndicatorDuration: 0.15
-  spinRadius: 1.75
+  spinRadius: 2
   spinDuration: 4
   spinRotationSpeed: 360
   spinBladeCount: 3

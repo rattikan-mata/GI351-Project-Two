@@ -695,7 +695,7 @@ public class PlayerController : MonoBehaviour
         while (Time.time - startTime < data.spinDuration && !isDead)
         {
             angle += data.spinRotationSpeed * Time.deltaTime;
-            Vector2 center = (firePoint != null) ? firePoint.position : transform.position;
+            Vector2 center = CenterPosition;
 
             for (int i = 0; i < bladeCount; i++)
             {

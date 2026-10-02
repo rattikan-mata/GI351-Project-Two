@@ -1307,7 +1307,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MainMenuController
   startButton: {fileID: 1923297819}
   exitButton: {fileID: 896650144}
-  gameplaySceneName: MAP TEST
+  gameplaySceneName: MAP TEST 1
 --- !u!4 &2107260348
 Transform:
   m_ObjectHideFlags: 0
