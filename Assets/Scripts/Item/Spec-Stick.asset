@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d32a37f219e3d6340a7f3e13e507dab0, type: 3}
-  m_Name: Stick
+  m_Name: Spec-Stick
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   itemName: Item
   icon: {fileID: 94058731202090889, guid: 5738f697d62538c4296acacf15f99c0b, type: 3}

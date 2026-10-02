@@ -292,7 +292,10 @@ public class PlayerController : MonoBehaviour
                 AudioManager.Instance?.PlaySFX("ammo_pickup");
                 break;
             case ItemData.ItemType.HealPotion:
-                Heal(item.amount); // เสียงฮีลเล่นในเมธอด Heal() เอง (ใช้ร่วมกับ Heal Over Time ด้วย)
+                // เติมเสียงใช้ยาดมตรงนี้ (ตั้งชื่อ ID ตามต้องการ เช่น "use_inhaler")
+                AudioManager.Instance?.PlaySFX("use_inhaler");
+
+                Heal(item.amount); // เสียงฮีล ("player_heal") จะถูกเล่นอัตโนมัติจากในฟังก์ชันนี้
                 break;
             case ItemData.ItemType.TradeItem:
                 AddTradeItem(item.amount);

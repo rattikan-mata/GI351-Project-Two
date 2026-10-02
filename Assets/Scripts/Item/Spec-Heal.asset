@@ -10,35 +10,35 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d32a37f219e3d6340a7f3e13e507dab0, type: 3}
-  m_Name: Sword
+  m_Name: Spec-Heal
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   itemName: Item
-  icon: {fileID: 3106341853739790030, guid: 5738f697d62538c4296acacf15f99c0b, type: 3}
-  attackSprite: {fileID: 21300000, guid: 4dfc9c8ce3736ba44a8234f37a68c9fc, type: 3}
+  icon: {fileID: 7145198348311737387, guid: 5738f697d62538c4296acacf15f99c0b, type: 3}
+  attackSprite: {fileID: 21300000, guid: 089e8c2f9e8a575428e443f9467bf999, type: 3}
   attackSpriteDuration: 0.2
   matchAttackSpriteToEffectDuration: 1
-  itemType: 4
+  itemType: 7
   amount: 1
   summonPrefab: {fileID: 0}
   summonOffset: {x: -1, y: 0}
-  maxDurability: 1
+  maxDurability: 2
   durabilityLossPerUse: 1
-  useCooldown: 0.5
-  damage: 5
+  useCooldown: 1
+  damage: 0
   knockbackForce: 6
   stunDuration: 0
   meleeRange: 0
-  punchMaxTargets: 0
+  punchMaxTargets: 1
   punchIndicatorPrefab: {fileID: 0}
   punchIndicatorColor: {r: 1, g: 1, b: 0, a: 0.5}
   punchIndicatorDuration: 0.15
-  spinRadius: 1.75
+  spinRadius: 0
   spinDuration: 5
   spinRotationSpeed: 360
   spinBladeCount: 3
   spinBladeHitRadius: 0.5
   spinHitInterval: 0.5
-  spinBladePrefab: {fileID: 8908638212447153639, guid: 550bc6b259e41424abad55f44440a908, type: 3}
+  spinBladePrefab: {fileID: 0}
   arcProjectilePrefab: {fileID: 0}
   arcProjectileSpeed: 0
   arcAngle: 0
@@ -52,7 +52,7 @@ MonoBehaviour:
   sniperSpeed: 0
   sniperRange: 0
   explosionRadius: 0
-  explodeAtMaxRange: 0
+  explodeAtMaxRange: 1
   explosionEffectPrefab: {fileID: 0}
   explosionEffectLifetime: 0
   fragmentPrefab: {fileID: 0}
@@ -62,7 +62,7 @@ MonoBehaviour:
   fragmentDamage: 0
   fragmentAngleOffset: 0
   fragmentSpawnOffset: 0
-  fragmentsIgnoreDirectTarget: 1
-  healTotalAmount: 0
-  healDuration: 0
-  healTickInterval: 0
+  fragmentsIgnoreDirectTarget: 0
+  healTotalAmount: 10
+  healDuration: 5
+  healTickInterval: 0.5

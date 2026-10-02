@@ -81,6 +81,9 @@ public class GrenadeProjectile : MonoBehaviour
         if (exploded) return;
         exploded = true;
 
+        // เติมเสียงหินระเบิดตรงนี้ (ถ้าอยากให้เสียงดังจากจุดที่ระเบิด ให้ใช้ PlaySFXAtPoint)
+        AudioManager.Instance?.PlaySFXAtPoint("grenade_explode", transform.position);
+
         Vector2 center = transform.position;
 
         // 1) ดาเมจระเบิดรอบจุดระเบิด (มอนแต่ละตัวโดนครั้งเดียว แม้มีหลาย Collider)
