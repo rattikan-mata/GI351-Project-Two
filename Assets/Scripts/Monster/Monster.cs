@@ -383,13 +383,23 @@ public class Monster : MonoBehaviour, IDamageable
     #endregion
 
     #region Damage & Death
+
+    private float lastHurtSoundTime = -999f;
+    private float hurtSoundCooldown = 0.1f;
+
     public virtual void TakeDamage(int amount)
     {
         if (isDead) return;
 
         currentHP -= amount;
         PlayHitFlash();
-        AudioManager.Instance?.PlaySFX("monster_hurt");
+
+        if (Time.time - lastHurtSoundTime >= hurtSoundCooldown)
+        {
+            AudioManager.Instance?.PlaySFX("monster_hurt");
+            lastHurtSoundTime = Time.time;
+        }
+
 
         if (healthBar != null)
         {

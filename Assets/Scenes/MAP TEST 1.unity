@@ -3829,14 +3829,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AudioManager
   sfxList:
   - id: melee_spin
-    clip: {fileID: 8300000, guid: f777da64d55b6b848b49178c3a28555e, type: 3}
-    volume: 0.753
+    clip: {fileID: 8300000, guid: df2145a9f372f0249aa64c4108880322, type: 3}
+    volume: 0.3
     pitch: 1
     randomizePitch: 0
     pitchVariance: 0
   - id: shotgun_arc
     clip: {fileID: 8300000, guid: 82d779df11771b74380542789c94afe7, type: 3}
-    volume: 1
+    volume: 0.241
     pitch: 1
     randomizePitch: 0
     pitchVariance: 0
@@ -3854,7 +3854,7 @@ MonoBehaviour:
     pitchVariance: 0
   - id: melee_punch
     clip: {fileID: 8300000, guid: 7ccef28c4ad122541bede522127356be, type: 3}
-    volume: 0.732
+    volume: 0.272
     pitch: 1
     randomizePitch: 0
     pitchVariance: 0
@@ -3926,9 +3926,9 @@ MonoBehaviour:
     pitchVariance: 0
   - id: monster_hurt
     clip: {fileID: 8300000, guid: 2bf10a4cfa95f7641aa9d4a813b22a63, type: 3}
-    volume: 1
+    volume: 0.364
     pitch: 1
-    randomizePitch: 0
+    randomizePitch: 1
     pitchVariance: 0
   musicList: []
   sfxSourceCount: 8
