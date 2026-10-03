@@ -355,9 +355,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Monster
   maxHP: 20
   healthBar: {fileID: 3836131174859905618}
-  moveSpeed: 2
-  detectionRange: 5
-  stoppingDistance: 0.6
+  moveSpeed: 4
+  detectionRange: 8
+  stoppingDistance: 0.8
   spriteRenderer: {fileID: 0}
   anim: {fileID: 0}
   hitFlashDuration: 0.1
