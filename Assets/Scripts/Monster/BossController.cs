@@ -350,14 +350,20 @@ public class BossController : Monster
     {
         if (isDead) return;
 
-        // สั่งเปิดประตูวาร์ป (ถ้ามีการตั้งค่าไว้ใน Inspector)
+        // สั่งเปิดประตูวาร์ป (มีอยู่แล้ว)
         if (exitPortal != null)
         {
             exitPortal.SetActive(true);
-            Debug.Log("[Boss] บอสตายแล้ว! ประตูวาร์ปเปิดออก");
         }
 
-        // เรียกใช้ระบบตายปกติของ Monster (ดรอปไอเทม และทำลายตัวเอง)
+        // --- โค้ดที่ต้องเติมเพิ่ม ---
+        if (bossName == "Tani") // สมมติว่าบอสตานีตั้งชื่อใน Inspector ว่า Tani
+        {
+            StoryManager.Instance.isTaniDefeated = true;
+            Debug.Log("ปลดล็อกวาร์ปคอกวัวแล้ว!");
+        }
+        // -----------------------
+
         base.Die();
     }
 
