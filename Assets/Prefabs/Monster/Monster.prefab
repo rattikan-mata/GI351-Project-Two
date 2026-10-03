@@ -355,8 +355,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Monster
   maxHP: 20
   healthBar: {fileID: 3836131174859905618}
-  moveSpeed: 4
-  detectionRange: 8
+  moveSpeed: 3
+  detectionRange: 7
   stoppingDistance: 0.8
   spriteRenderer: {fileID: 0}
   anim: {fileID: 0}
@@ -376,16 +376,16 @@ MonoBehaviour:
   - item: {fileID: 11400000, guid: 2f676423b679ee1408567e8eaadb409c, type: 2}
     weight: 1
   dropItemPrefab: {fileID: 0}
-  contactDamage: 5
-  attackCooldown: 0.7
+  contactDamage: 4
+  attackCooldown: 1
   attackKnockbackForce: 5
-  dashAttackRange: 3
-  dashSpeed: 12
+  dashAttackRange: 2.6
+  dashSpeed: 10
   dashDuration: 0.25
   dashRecoveryTime: 1.5
   warningColor: {r: 1, g: 0, b: 0.08972883, a: 1}
-  warningDuration: 1
-  blinkInterval: 0.2
+  warningDuration: 1.2
+  blinkInterval: 0.3
 --- !u!50 &7059108542250385496
 Rigidbody2D:
   serializedVersion: 5
