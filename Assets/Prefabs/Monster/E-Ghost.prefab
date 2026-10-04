@@ -134,8 +134,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 2631651466247277798}
   m_Father: {fileID: 0}
@@ -212,11 +212,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6e3c54e26736c64db507103f4d2a9fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Monster
-  maxHP: 20
+  maxHP: 30
   healthBar: {fileID: 649458585622112306}
-  moveSpeed: 2
-  detectionRange: 5
-  stoppingDistance: 0.6
+  moveSpeed: 4
+  detectionRange: 7
+  stoppingDistance: 0.7
   spriteRenderer: {fileID: 0}
   anim: {fileID: 2916550776060155589}
   hitFlashDuration: 0.1
@@ -237,14 +237,14 @@ MonoBehaviour:
   dropItemPrefab: {fileID: 0}
   contactDamage: 5
   attackCooldown: 1
-  attackKnockbackForce: 5
-  dashAttackRange: 2
-  dashSpeed: 12
-  dashDuration: 0.25
+  attackKnockbackForce: 8
+  dashAttackRange: 4
+  dashSpeed: 8
+  dashDuration: 0.22
   dashRecoveryTime: 1.5
   warningColor: {r: 1, g: 0, b: 0.08972883, a: 1}
   warningDuration: 1
-  blinkInterval: 0.2
+  blinkInterval: 0.15
 --- !u!50 &986852230179694831
 Rigidbody2D:
   serializedVersion: 5
