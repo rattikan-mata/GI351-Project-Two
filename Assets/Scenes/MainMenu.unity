@@ -119,6 +119,170 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &694165900
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 694165902}
+  - component: {fileID: 694165901}
+  m_Layer: 0
+  m_Name: Audio Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &694165901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 694165900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 786728d1d5d2b56428a30c7a1513ab30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AudioManager
+  sfxList:
+  - id: melee_spin
+    clip: {fileID: 8300000, guid: df2145a9f372f0249aa64c4108880322, type: 3}
+    volume: 0.3
+    pitch: 1
+    randomizePitch: 0
+    pitchVariance: 0
+  - id: shotgun_arc
+    clip: {fileID: 8300000, guid: 82d779df11771b74380542789c94afe7, type: 3}
+    volume: 0.241
+    pitch: 1
+    randomizePitch: 0
+    pitchVariance: 0
+  - id: sniper_shot
+    clip: {fileID: 8300000, guid: 3bfaec2885f6d234384fbe0519b0a371, type: 3}
+    volume: 0.623
+    pitch: 1
+    randomizePitch: 0
+    pitchVariance: 0
+  - id: grenade_explode
+    clip: {fileID: 8300000, guid: c95f8c8facd11684aa311745a7c809c1, type: 3}
+    volume: 1
+    pitch: 1
+    randomizePitch: 0
+    pitchVariance: 0
+  - id: melee_punch
+    clip: {fileID: 8300000, guid: 7ccef28c4ad122541bede522127356be, type: 3}
+    volume: 0.272
+    pitch: 1
+    randomizePitch: 0
+    pitchVariance: 0
+  - id: heal_over_time_start
+    clip: {fileID: 8300000, guid: 47ad6a5233933ca4faa757ab2cb35acb, type: 3}
+    volume: 1
+    pitch: 1
+    randomizePitch: 0
+    pitchVariance: 0
+  - id: player_heal
+    clip: {fileID: 8300000, guid: f0313a015b58d1b4dae1da61041d1b61, type: 3}
+    volume: 1
+    pitch: 1
+    randomizePitch: 0
+    pitchVariance: 0
+  - id: item_pickup
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    randomizePitch: 0
+    pitchVariance: 0
+  - id: item_drop
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    randomizePitch: 0
+    pitchVariance: 0
+  - id: player_hurt
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    randomizePitch: 0
+    pitchVariance: 0
+  - id: player_die
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    randomizePitch: 0
+    pitchVariance: 0
+  - id: player_walk
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    randomizePitch: 0
+    pitchVariance: 0
+  - id: boss_dash
+    clip: {fileID: 8300000, guid: b1970f330e5f805409f889670fa7bed0, type: 3}
+    volume: 0.583
+    pitch: 1
+    randomizePitch: 0
+    pitchVariance: 0
+  - id: boss_shoot
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    randomizePitch: 0
+    pitchVariance: 0
+  - id: monster_detect
+    clip: {fileID: 8300000, guid: cb5b9550e569e2b4cb4ff941876942f6, type: 3}
+    volume: 0.377
+    pitch: 1
+    randomizePitch: 0
+    pitchVariance: 0
+  - id: monster_dash
+    clip: {fileID: 8300000, guid: b1970f330e5f805409f889670fa7bed0, type: 3}
+    volume: 0.296
+    pitch: 1
+    randomizePitch: 0
+    pitchVariance: 0
+  - id: monster_hurt
+    clip: {fileID: 8300000, guid: 2bf10a4cfa95f7641aa9d4a813b22a63, type: 3}
+    volume: 0.364
+    pitch: 1
+    randomizePitch: 1
+    pitchVariance: 0
+  musicList:
+  - id: Game
+    clip: {fileID: 8300000, guid: f4fae6eccfe34a342844697d876f8300, type: 3}
+    volume: 0.249
+    pitch: 1
+    randomizePitch: 0
+    pitchVariance: 0
+  - id: MainMenu
+    clip: {fileID: 8300000, guid: ed34cec3284360244914bf1aae04b91b, type: 3}
+    volume: 0.249
+    pitch: 1
+    randomizePitch: 0
+    pitchVariance: 0
+  sfxSourceCount: 8
+  masterSfxVolume: 1
+  masterMusicVolume: 1
+  dontDestroyOnLoad: 1
+--- !u!4 &694165902
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 694165900}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 16.28269, y: 20.24833, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &885572602
 GameObject:
   m_ObjectHideFlags: 0
@@ -612,6 +776,51 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1458370001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1458370003}
+  - component: {fileID: 1458370002}
+  m_Layer: 0
+  m_Name: BGM_Setup
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1458370002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1458370001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21bdd111fc584a146a33b72a588ca8ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SceneBGM
+  bgmId: MainMenu
+--- !u!4 &1458370003
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1458370001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.31948, y: 6.87, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1923297813
 GameObject:
   m_ObjectHideFlags: 0
@@ -915,3 +1124,5 @@ SceneRoots:
   - {fileID: 1426995742}
   - {fileID: 1270344341}
   - {fileID: 2107260348}
+  - {fileID: 1458370003}
+  - {fileID: 694165902}
