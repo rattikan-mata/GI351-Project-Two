@@ -83,7 +83,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: -1
+  m_SortingOrder: 1
   m_MaskInteraction: 0
   m_Sprite: {fileID: 4868264717086758733, guid: 34e5b8a0d7551774f98cb6fcc682bf53, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -227,7 +227,7 @@ MonoBehaviour:
   dropChance: 0.3
   worldItemPrefab: {fileID: 0}
   dropTable: []
-  dropItemPrefab: {fileID: 0}
+  dropItemPrefab: {fileID: 8318784822403802795, guid: 4cd525115cfd6644fba81b51369e71e0, type: 3}
   contactDamage: 10
   attackCooldown: 1
   attackKnockbackForce: 5
@@ -238,9 +238,11 @@ MonoBehaviour:
   warningColor: {r: 0, g: 1, b: 1, a: 1}
   warningDuration: 1.5
   blinkInterval: 0.1
-  bossName: Boss
+  bossName: Pop
   exitPortal: {fileID: 0}
-  bossUIRadius: 10
+  bossUIRadius: 15
+  encounterShakeDuration: 3
+  encounterShakeMagnitude: 0.08
   skillRange: 15
   skillCooldown: 1.5
   areaIndicatorPrefab: {fileID: 3664759133385990090, guid: 739aee3eaeec5944691401c44cbda48c, type: 3}
@@ -269,7 +271,6 @@ MonoBehaviour:
   slamRadius: 4
   slamDamage: 10
   slamKnockbackForce: 12
-  slamStunDuration: 0
   slamTelegraphColor: {r: 1, g: 0, b: 0, a: 0.4745098}
   slamTelegraphDuration: 1.1
   slamBlinkInterval: 0.2
