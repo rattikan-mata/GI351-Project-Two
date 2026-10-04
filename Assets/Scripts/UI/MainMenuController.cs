@@ -6,7 +6,7 @@ public class MainMenuController : MonoBehaviour
 {
     [SerializeField] private Button startButton;
     [SerializeField] private Button exitButton;
-    [SerializeField] private string gameplaySceneName = "MAP TEST";
+    [SerializeField] private string gameplaySceneName = "MAP TEST 1";
 
     private void Start()
     {
