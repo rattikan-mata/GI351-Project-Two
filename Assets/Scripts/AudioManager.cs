@@ -10,6 +10,12 @@ public class AudioManager : MonoBehaviour
     {
         public string id;
         public AudioClip clip;
+
+
+        [Tooltip("ถ้าใส่ไฟล์เสียงหลายอันตรงนี้ ระบบจะสุ่มเลือกให้เอง (เหมาะกับเสียงเดิน/เสียงโดนตี)")]
+        public AudioClip[] randomClips;
+     
+
         [Range(0f, 1f)] public float volume = 1f;
         public float pitch = 1f;
         public bool randomizePitch = false;
@@ -82,19 +88,41 @@ public class AudioManager : MonoBehaviour
     public void PlaySFX(string id)
     {
         if (string.IsNullOrEmpty(id)) return;
-        if (!sfxLookup.TryGetValue(id, out Sound sound) || sound.clip == null) return;
+        if (!sfxLookup.TryGetValue(id, out Sound sound)) return;
+
+        // --- เพิ่มระบบสุ่มไฟล์เสียงตรงนี้ ---
+        AudioClip clipToPlay = sound.clip;
+        if (sound.randomClips != null && sound.randomClips.Length > 0)
+        {
+            // สุ่มเลือก 1 ไฟล์จากใน Array
+            clipToPlay = sound.randomClips[Random.Range(0, sound.randomClips.Length)];
+        }
+        if (clipToPlay == null) return; // ถ้าไม่ใส่เสียงไว้เลย ให้ข้ามไป
+        // -------------------------------
 
         AudioSource src = sfxSources[nextSfxSourceIndex];
         nextSfxSourceIndex = (nextSfxSourceIndex + 1) % sfxSources.Length;
         src.pitch = sound.randomizePitch ? sound.pitch + Random.Range(-sound.pitchVariance, sound.pitchVariance) : sound.pitch;
-        src.PlayOneShot(sound.clip, sound.volume * masterSfxVolume);
+
+        // เปลี่ยนมาเล่นเสียง clipToPlay แทน sound.clip
+        src.PlayOneShot(clipToPlay, sound.volume * masterSfxVolume);
     }
 
     public void PlaySFXAtPoint(string id, Vector3 position)
     {
         if (string.IsNullOrEmpty(id)) return;
-        if (!sfxLookup.TryGetValue(id, out Sound sound) || sound.clip == null) return;
-        AudioSource.PlayClipAtPoint(sound.clip, position, sound.volume * masterSfxVolume);
+        if (!sfxLookup.TryGetValue(id, out Sound sound)) return;
+
+        // --- เพิ่มระบบสุ่มไฟล์เสียงเหมือนด้านบน ---
+        AudioClip clipToPlay = sound.clip;
+        if (sound.randomClips != null && sound.randomClips.Length > 0)
+        {
+            clipToPlay = sound.randomClips[Random.Range(0, sound.randomClips.Length)];
+        }
+        if (clipToPlay == null) return;
+        // -------------------------------
+
+        AudioSource.PlayClipAtPoint(clipToPlay, position, sound.volume * masterSfxVolume);
     }
 
     public void PlayMusic(string id)
