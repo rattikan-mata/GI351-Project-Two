@@ -12,7 +12,10 @@ public class UIInventoryView : MonoBehaviour
         public TextMeshProUGUI countText;
     }
 
+    [Header("Slots (Fixed 4 Slots)")]
     [SerializeField] private SlotUI[] slots = new SlotUI[4];
+
+    [Header("Colors")]
     [SerializeField] private Color normalColor = Color.white;
     [SerializeField] private Color selectedColor = Color.yellow;
 

@@ -12,9 +12,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private UICameraEffect cameraEffect;
     [SerializeField] private UICombatTextSpawner combatTextSpawner;
 
-    [Header("Scene Config")]
+    [Header("Scene Settings")]
     [SerializeField] private string mainMenuSceneName = "MainMenu";
-    [SerializeField] private string gameplaySceneName = "MAP TEST";
+    [SerializeField] private string gameplaySceneName = "MAP TEST 1";
 
     private bool isPaused = false;
 
@@ -68,7 +68,9 @@ public class UIManager : MonoBehaviour
             {
                 var item = slots[i].item;
                 Sprite icon = item.icon != null ? item.icon : PlaceholderIconFactory.GetPlaceholder(item.itemType);
-                string text = item.maxDurability > 0 ? slots[i].currentDurability.ToString() : (item.amount > 0 ? item.amount.ToString() : "1");
+                string text = item.maxDurability > 0
+                    ? slots[i].currentDurability.ToString()
+                    : (item.amount > 0 ? item.amount.ToString() : "1");
                 inventoryView.UpdateSlotDisplay(i, icon, text, i == activeIdx);
             }
             else

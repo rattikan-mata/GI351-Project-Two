@@ -9,6 +9,7 @@ public class Monster : MonoBehaviour, IDamageable
     #region Health
     [Header("Health")]
     [SerializeField] protected int maxHP = 10;
+    // แก้ไขกลับมาเป็น EnemyHealthBar
     [SerializeField] protected EnemyHealthBar healthBar;
     protected int currentHP;
     public int CurrentHP => currentHP;
@@ -33,9 +34,9 @@ public class Monster : MonoBehaviour, IDamageable
     [SerializeField] protected Animator anim;
     [SerializeField] protected float hitFlashDuration = 0.1f;
 
-    protected Color originalColor; // เปิดเป็น protected ให้คลาสลูก (เช่น BossController) ใช้ตอนกระพริบสีเตือนท่าได้
+    protected Color originalColor;
     private float flashUntil = 0f;
-    protected bool isFlashing = false; // เปิดเป็น protected เหตุผลเดียวกับด้านบน
+    protected bool isFlashing = false;
     #endregion
 
     #region Stun
@@ -55,28 +56,18 @@ public class Monster : MonoBehaviour, IDamageable
     protected bool isKnockedBack = false;
     #endregion
 
-    #region Item Drop (ดรอปไอเทมสุ่มตอนตาย ปรับได้ว่าใส่ไอเทมอะไรเข้าไปได้บ้าง)
+    #region Item Drop
     [System.Serializable]
     public class DropEntry
     {
-        [Tooltip("ItemData ที่จะดรอป (ใช้ได้ทั้งไอเทมใช้ครั้งเดียวและไอเทมอาวุธที่มีความคงทน)")]
         public ItemData item;
-
-        [Tooltip("น้ำหนักในการสุ่ม เทียบกับรายการอื่นในลิสต์นี้ (ยิ่งมากยิ่งดรอปบ่อย ไม่ใช่ % ตรงๆ)")]
         public float weight = 1f;
     }
 
     [Header("Item Drop")]
-    [Tooltip("โอกาสที่มอนตัวนี้จะดรอปของเมื่อตาย (0-1) ถ้าดรอปสำเร็จ จะสุ่มเลือก 1 ชิ้นจาก Drop Table ด้านล่างตามน้ำหนัก")]
     [SerializeField, Range(0f, 1f)] protected float dropChance = 0.3f;
-
-    [Tooltip("ลาก Prefab เปล่าที่มีแค่ WorldItem.cs (เช่น Prefabs/Item) ใช้ตอนดรอปไอเทมจาก Drop Table ด้านล่าง")]
     [SerializeField] protected GameObject worldItemPrefab;
-
-    [Tooltip("รายการไอเทมที่มอนตัวนี้ดรอปได้ ปรับได้อิสระต่อมอนแต่ละตัว/แต่ละ Prefab เช่น มอนธรรมดาดรอปกระสุน/ยาฮีล มอนพิเศษดรอปอาวุธ")]
     [SerializeField] protected List<DropEntry> dropTable = new List<DropEntry>();
-
-    [Tooltip("(ทางเลือกเสริม) Prefab พิเศษที่ไม่ใช่ WorldItem ธรรมดา เช่นไอเทม Summon ที่มี component เฉพาะของตัวเอง ถ้าตั้งไว้และ Drop Table ว่าง/สุ่มไม่ได้ จะดรอปตัวนี้แทน")]
     [SerializeField] protected GameObject dropItemPrefab;
     #endregion
 
@@ -120,11 +111,7 @@ public class Monster : MonoBehaviour, IDamageable
             healthBar = GetComponentInChildren<EnemyHealthBar>();
         }
 
-        // สำคัญ: ถ้า Rigidbody2D ของมอน/ผู้เล่นเป็น Kinematic ทั้งคู่ (ปกติของเกมที่คุมการเดินเองด้วย MovePosition)
-        // Unity จะไม่ยิง OnCollisionEnter/Stay2D ให้เลยถ้าไม่เปิดตัวนี้ไว้ -> เป็นสาเหตุหลักที่ดาเมจ/HP ไม่ลด
         rb.useFullKinematicContacts = true;
-
-        // ป้องกันมอนวิ่งพุ่ง (dash) เร็วจนทะลุผ่านผู้เล่นในเฟรมเดียวโดยไม่เกิดการชน (tunneling)
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
         if (spriteRenderer != null)
@@ -168,18 +155,17 @@ public class Monster : MonoBehaviour, IDamageable
 
         if (spriteRenderer != null && !isDead && !isStunned)
         {
-            if (rb.linearVelocity.x < -0.1f) // เดินไปทางซ้าย
+            if (rb.linearVelocity.x < -0.1f)
             {
                 spriteRenderer.flipX = true;
             }
-            else if (rb.linearVelocity.x > 0.1f) // เดินไปทางขวา
+            else if (rb.linearVelocity.x > 0.1f)
             {
                 spriteRenderer.flipX = false;
             }
         }
         if (anim != null)
         {
-            // เช็คว่ามีความเร็วการเดินอยู่หรือไม่
             bool moving = rb.linearVelocity.sqrMagnitude > 0.01f;
             anim.SetBool("isMoving", moving);
         }
@@ -189,16 +175,11 @@ public class Monster : MonoBehaviour, IDamageable
     {
         if (isDead || playerTransform == null) return;
 
-        // Knockback and the actual dash movement drive rb.linearVelocity themselves
-        // from their coroutines. If we zero the velocity here too, we run BEFORE the
-        // physics step every fixed frame and stomp whatever the coroutine just set,
-        // so the monster never actually moves (it only visually flashes/telegraphs).
         if (isKnockedBack || isDashing)
         {
             return;
         }
 
-        // Stunned (and not being knocked back) or mid-telegraph/recovery: hold still.
         if (isStunned || isAttacking)
         {
             rb.linearVelocity = Vector2.zero;
@@ -227,14 +208,8 @@ public class Monster : MonoBehaviour, IDamageable
         HandleContactDamage(other);
     }
 
-    /// <summary>
-    /// ใช้ร่วมกันทั้ง Enter และ Stay เพราะการพุ่งชน (dash) เร็วมาก
-    /// บางทีสัมผัสกันแค่เฟรมเดียว (เกิด Enter แต่ไม่มี Stay ตามมา) ถ้าดักแค่ Stay อย่างเดียวอาจพลาดได้
-    /// </summary>
     private void HandleContactDamage(Collision2D other)
     {
-        // Debug ชั่วคราว: ถ้า log นี้ไม่ขึ้นเลยตอนมอนพุ่งชนผู้เล่น แปลว่าปัญหาอยู่ที่ Physics setup
-        // (Collider หาย/เป็น Trigger/Layer Collision Matrix ปิดไว้) ไม่ใช่ปัญหาที่ logic ข้างล่าง
         Debug.Log($"[Monster] ชนกับ: {other.gameObject.name}, isDashing={isDashing}");
 
         if (!isDashing || isDead || isStunned) return;
@@ -332,7 +307,7 @@ public class Monster : MonoBehaviour, IDamageable
     #region Item Drop Logic
     protected virtual void TryDropItem()
     {
-        if (Random.value > dropChance) return; // ไม่ติดโอกาสดรอปรอบนี้
+        if (Random.value > dropChance) return;
 
         ItemData chosenItem = ChooseDropItem();
 
@@ -341,22 +316,17 @@ public class Monster : MonoBehaviour, IDamageable
             GameObject obj = Instantiate(worldItemPrefab, transform.position, Quaternion.identity);
             if (obj.TryGetComponent<WorldItem>(out var worldItem))
             {
-                // durability ไม่ระบุ (-1) -> WorldItem.Setup จะเติมความคงทนเต็มให้เองถ้าไอเทมนั้นมีความคงทน
                 worldItem.Setup(chosenItem);
             }
             return;
         }
 
-        // Fallback: ไม่มี Drop Table ที่ใช้ได้ (ว่าง/น้ำหนักรวมเป็น 0/ไม่ได้ลาก World Item Prefab ไว้)
-        // -> ถ้าตั้ง Drop Item Prefab แบบเดิมไว้ ก็ยังดรอปตัวนั้นได้ตามปกติ
         if (dropItemPrefab != null)
         {
             Instantiate(dropItemPrefab, transform.position, Quaternion.identity);
         }
     }
 
-    // สุ่มเลือกไอเทม 1 ชิ้นจาก dropTable ตามน้ำหนัก (Weighted Random)
-    // เช่น A weight 3, B weight 1 -> A มีโอกาสออก 75%, B 25% ของรอบที่ดรอปสำเร็จ
     private ItemData ChooseDropItem()
     {
         if (dropTable == null || dropTable.Count == 0) return null;
@@ -378,12 +348,11 @@ public class Monster : MonoBehaviour, IDamageable
             if (roll <= cumulative) return entry.item;
         }
 
-        return null; // เผื่อ floating point คลาดเคลื่อนนิดหน่อย
+        return null;
     }
     #endregion
 
     #region Damage & Death
-
     private float lastHurtSoundTime = -999f;
     private float hurtSoundCooldown = 0.1f;
 
@@ -399,7 +368,6 @@ public class Monster : MonoBehaviour, IDamageable
             AudioManager.Instance?.PlaySFX("monster_hurt");
             lastHurtSoundTime = Time.time;
         }
-
 
         if (healthBar != null)
         {
@@ -480,7 +448,6 @@ public class Monster : MonoBehaviour, IDamageable
             Vector2 dashDirection = ((Vector2)playerTransform.position - rb.position).normalized;
             float dashTime = 0f;
 
-            // 2. เติมเสียงตอนเริ่มพุ่งชน (แดช) ตรงนี้
             AudioManager.Instance?.PlaySFX("monster_dash");
 
             isDashing = true;
