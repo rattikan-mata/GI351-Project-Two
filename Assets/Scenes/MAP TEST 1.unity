@@ -13179,13 +13179,13 @@ MonoBehaviour:
   musicList:
   - id: Game
     clip: {fileID: 8300000, guid: f4fae6eccfe34a342844697d876f8300, type: 3}
-    volume: 0.249
+    volume: 0.15
     pitch: 1
     randomizePitch: 0
     pitchVariance: 0
   - id: MainMenu
     clip: {fileID: 8300000, guid: ed34cec3284360244914bf1aae04b91b, type: 3}
-    volume: 0.249
+    volume: 0.15
     pitch: 1
     randomizePitch: 0
     pitchVariance: 0
