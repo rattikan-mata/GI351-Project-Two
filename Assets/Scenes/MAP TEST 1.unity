@@ -155621,7 +155621,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7342403226490159486, guid: da889f75ac0e04d46a6c782045b04fce, type: 3}
       propertyPath: nothingDropWeight
-      value: 1
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7342403226490159486, guid: da889f75ac0e04d46a6c782045b04fce, type: 3}
+      propertyPath: possibleDrops.Array.data[0].dropWeight
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7342403226490159486, guid: da889f75ac0e04d46a6c782045b04fce, type: 3}
+      propertyPath: possibleDrops.Array.data[3].dropWeight
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

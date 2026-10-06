@@ -709,20 +709,30 @@ public class PlayerController : MonoBehaviour
                     visuals[i].transform.rotation = Quaternion.Euler(0f, 0f, a);
                 }
 
-                Collider2D[] hits = Physics2D.OverlapCircleAll(bladePos, data.spinBladeHitRadius, monsterLayer);
+                Collider2D[] hits = Physics2D.OverlapCircleAll(bladePos, data.spinBladeHitRadius);
                 foreach (var hit in hits)
                 {
-                    if (!hit.TryGetComponent<Monster>(out var monster)) continue;
+                    // เปลี่ยนจากเช็กหา Monster มาเป็นการหา IDamageable เพื่อให้ฟันไหหรืออะไรก็ตามที่พังได้
+                    if (!hit.TryGetComponent<IDamageable>(out var damageable)) continue;
 
-                    if (lastHitTime.TryGetValue(monster, out float lastTime) && Time.time - lastTime < data.spinHitInterval) continue;
-                    lastHitTime[monster] = Time.time;
+                    // ถ้าสิ่งที่ตีโดนเป็น Monster ให้เช็กคูลดาวน์การตีซ้ำและทำสถานะต่างๆ
+                    if (hit.TryGetComponent<Monster>(out var monster))
+                    {
+                        if (lastHitTime.TryGetValue(monster, out float lastTime) && Time.time - lastTime < data.spinHitInterval) continue;
+                        lastHitTime[monster] = Time.time;
 
-                    monster.TakeDamage(data.damage);
+                        monster.TakeDamage(data.damage);
 
-                    Vector2 dir = ((Vector2)monster.transform.position - center).normalized;
-                    monster.ApplyKnockback(dir, data.knockbackForce);
+                        Vector2 dir = ((Vector2)monster.transform.position - center).normalized;
+                        monster.ApplyKnockback(dir, data.knockbackForce);
 
-                    if (data.stunDuration > 0f) monster.ApplyStun(data.stunDuration);
+                        if (data.stunDuration > 0f) monster.ApplyStun(data.stunDuration);
+                    }
+                    else
+                    {
+                        // ถ้าเป็นอย่างอื่น (เช่น ไห) ให้ทำดาเมจตรงๆ ไปเลย
+                        damageable.TakeDamage(data.damage);
+                    }
                 }
             }
 
@@ -751,32 +761,42 @@ public class PlayerController : MonoBehaviour
         // ภาพจริงที่เห็นในเกม (ไม่ใช่แค่ debug): สปอน Sprite hitbox ถ้าตั้ง Punch Indicator Prefab ไว้ใน ItemData
         SpawnAreaIndicator(origin, data.meleeRange, data.punchIndicatorColor, data.punchIndicatorDuration, data.punchIndicatorPrefab);
 
-        Collider2D[] hits = Physics2D.OverlapCircleAll(origin, data.meleeRange, monsterLayer);
+        // 1. กวาดหาวัตถุในทุกเลเยอร์รอบระยะหมัด (ไม่จำกัดแค่ monsterLayer)
+        Collider2D[] hits = Physics2D.OverlapCircleAll(origin, data.meleeRange);
 
-        // รวบรวมมอนที่อยู่ในระยะ (กันซ้ำกรณีมอนตัวเดียวมีหลาย Collider)
-        var targets = new List<Monster>();
+        // 2. รวบรวมสิ่งที่มี IDamageable ทั้งหมด (กันซ้ำกรณีมีหลาย Collider)
+        var targets = new System.Collections.Generic.List<Collider2D>();
         foreach (var hit in hits)
         {
-            if (hit.TryGetComponent<Monster>(out var monster) && !targets.Contains(monster))
+            if (hit.GetComponent<IDamageable>() != null && !targets.Contains(hit))
             {
-                targets.Add(monster);
+                targets.Add(hit);
             }
         }
 
-        // เรียงจากใกล้ผู้เล่นที่สุดไปไกลสุด
+        // 3. เรียงลำดับเป้าหมายจากใกล้ผู้เล่นที่สุดไปไกลสุด
         targets.Sort((a, b) =>
             ((Vector2)a.transform.position - playerPos).sqrMagnitude
             .CompareTo(((Vector2)b.transform.position - playerPos).sqrMagnitude));
 
+        // 4. ทำดาเมจตามจำนวนเป้าหมายสูงสุดที่ต่อยได้ (เช่น 1 ตัว)
         int count = Mathf.Min(Mathf.Max(1, data.punchMaxTargets), targets.Count);
         for (int i = 0; i < count; i++)
         {
-            Monster monster = targets[i];
-            monster.TakeDamage(data.damage);
+            Collider2D targetCol = targets[i];
 
-            Vector2 dir = ((Vector2)monster.transform.position - playerPos).normalized;
-            monster.ApplyKnockback(dir, data.knockbackForce);
-            //ตั้งใจไม่เรียก ApplyStun ตรงนี้ -> หมัดพระเอาสตันออกตามที่ต้องการ
+            // สั่งทำดาเมจใส่สิ่งที่ตีโดน (ทั้งผีและไห)
+            if (targetCol.TryGetComponent<IDamageable>(out var damageable))
+            {
+                damageable.TakeDamage(data.damage);
+            }
+
+            // ถ้าสิ่งที่ตีโดนเป็นผี (Monster) ให้ผลักกระเด็นด้วย
+            if (targetCol.TryGetComponent<Monster>(out var monster))
+            {
+                Vector2 dir = ((Vector2)monster.transform.position - playerPos).normalized;
+                monster.ApplyKnockback(dir, data.knockbackForce);
+            }
         }
     }
 

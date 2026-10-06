@@ -279,7 +279,7 @@ public class Monster : MonoBehaviour, IDamageable
     #endregion
 
     #region Knockback Logic
-    public void ApplyKnockback(Vector2 direction, float force)
+    public virtual void ApplyKnockback(Vector2 direction, float force)
     {
         if (isDead) return;
         StopCoroutine(nameof(KnockbackRoutine));
