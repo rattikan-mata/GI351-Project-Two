@@ -5604,7 +5604,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 4
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: eca18987ffa5e424f8e837bb27246026, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -11332,7 +11332,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &442244682
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12139,9 +12139,17 @@ PrefabInstance:
     m_TransformParent: {fileID: 1937643720}
     m_Modifications:
     - target: {fileID: -1281301236709249638, guid: 76889eda1f275374e9f9d8fe5353aeab, type: 3}
+      propertyPath: dropChance
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -1281301236709249638, guid: 76889eda1f275374e9f9d8fe5353aeab, type: 3}
       propertyPath: exitPortal
       value: 
       objectReference: {fileID: 1341744342}
+    - target: {fileID: -1281301236709249638, guid: 76889eda1f275374e9f9d8fe5353aeab, type: 3}
+      propertyPath: worldItemPrefab
+      value: 
+      objectReference: {fileID: 5533808792794430445, guid: 5ca50c28f7c2de94eaf8ab55a0d38357, type: 3}
     - target: {fileID: 3288230206911401485, guid: 76889eda1f275374e9f9d8fe5353aeab, type: 3}
       propertyPath: m_Name
       value: Tani
@@ -42707,7 +42715,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1341744343
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -151987,7 +151995,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 4
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: eca18987ffa5e424f8e837bb27246026, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
