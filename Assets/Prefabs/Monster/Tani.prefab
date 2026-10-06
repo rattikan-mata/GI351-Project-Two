@@ -83,7 +83,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 3
   m_MaskInteraction: 0
   m_Sprite: {fileID: 2007025658586607896, guid: 9f7fba3a94669b64183d4650770ab9f9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -169,14 +169,17 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: -0.625, y: 0.96875}
-      - {x: -0.875, y: 0.59375}
-      - {x: -0.9375, y: 0.28125}
-      - {x: -0.9375, y: -0.84375}
-      - {x: -0.375, y: -0.96875}
+    - - {x: -0.26815605, y: 0.96081924}
+      - {x: -0.56251144, y: 0.40240097}
+      - {x: -0.52612305, y: -0.19122696}
+      - {x: -0.8264828, y: -0.32037735}
+      - {x: -0.8112354, y: -0.7355499}
+      - {x: -0.3908615, y: -0.7546463}
+      - {x: -0.14911461, y: -0.95879745}
       - {x: 0.5625, y: -0.96875}
-      - {x: 0.9375, y: -0.71875}
-      - {x: 0.9375, y: 0.59375}
+      - {x: 0.6044464, y: -0.6315193}
+      - {x: 0.73844147, y: 0.05517578}
+      - {x: 0.8502712, y: 0.61753845}
       - {x: 0.4375, y: 0.96875}
   m_UseDelaunayMesh: 1
 --- !u!95 &4917181424410279538
@@ -276,3 +279,14 @@ MonoBehaviour:
   slamBlinkInterval: 0.2
   slamEffectPrefab: {fileID: 7584986430880826807, guid: 739aee3eaeec5944691401c44cbda48c, type: 3}
   slamEffectLifetime: 1
+  crazyDashEnabled: 0
+  crazyDashWeight: 1
+  crazyDashSpeed: 15
+  crazyDashWarningTime: 0.5
+  crazyDashMaxTime: 3
+  crazyDashImpactDamage: 15
+  crazyDashSelfStunDuration: 2
+  trackingShootEnabled: 0
+  trackingShootWeight: 1
+  trackingShootCount: 3
+  trackingShootDelay: 0.4

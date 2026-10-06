@@ -83,7 +83,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 3
   m_MaskInteraction: 0
   m_Sprite: {fileID: 4868264717086758733, guid: 34e5b8a0d7551774f98cb6fcc682bf53, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -169,15 +169,15 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: -0.625, y: 0.96875}
-      - {x: -0.875, y: 0.59375}
-      - {x: -0.9375, y: 0.28125}
-      - {x: -0.9375, y: -0.84375}
+    - - {x: -0.080020905, y: 0.966156}
+      - {x: -0.43755364, y: 0.6534958}
+      - {x: -0.38934302, y: 0.25293732}
+      - {x: -0.40924168, y: -0.051044464}
       - {x: -0.375, y: -0.96875}
       - {x: 0.5625, y: -0.96875}
-      - {x: 0.9375, y: -0.71875}
-      - {x: 0.9375, y: 0.59375}
-      - {x: 0.4375, y: 0.96875}
+      - {x: 0.66022444, y: -0.6853142}
+      - {x: 0.6960194, y: 0.62461853}
+      - {x: 0.582345, y: 0.8750267}
   m_UseDelaunayMesh: 1
 --- !u!95 &4917181424410279538
 Animator:
@@ -224,10 +224,10 @@ MonoBehaviour:
   stunColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   stunDuration: 1.5
   knockbackDuration: 0.15
-  dropChance: 0.3
-  worldItemPrefab: {fileID: 0}
+  dropChance: 1
+  worldItemPrefab: {fileID: 7612926946956983133, guid: 4f5d20dffd31dfa4aa8bf984fbedecc0, type: 3}
   dropTable: []
-  dropItemPrefab: {fileID: 8318784822403802795, guid: 4cd525115cfd6644fba81b51369e71e0, type: 3}
+  dropItemPrefab: {fileID: 7612926946956983133, guid: 4f5d20dffd31dfa4aa8bf984fbedecc0, type: 3}
   contactDamage: 10
   attackCooldown: 1
   attackKnockbackForce: 5
