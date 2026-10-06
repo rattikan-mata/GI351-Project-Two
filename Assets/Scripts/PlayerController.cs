@@ -66,15 +66,25 @@ public class PlayerController : MonoBehaviour
     public bool HasAmmo => currentAmmo > 0;
     #endregion
 
-    #region Health
-    [Header("Health")]
+    #region Health & Hit Feedback
+    [Header("Health & Hit Feedback")]
     [SerializeField] private int maxHP = 20;
     private int currentHP;
     public int CurrentHP => currentHP;
     public int MaxHP => maxHP;
 
-    // ระยะเวลาที่ผู้เล่นจะไม่สามารถโดนโจมตีซ้ำได้หลังจากโดนโจมตีครั้งล่าสุด (วินาที)
+    [Tooltip("ระยะเวลาที่ผู้เล่นจะไม่สามารถโดนโจมตีซ้ำได้ (วินาที)")]
     [SerializeField] private float invincibilityDuration = 0.5f;
+
+    [Tooltip("ความเร็วในการกะพริบสเปรต์ตัวละคร (ค่าน้อยจะกะพริบถี่มาก)")]
+    [SerializeField] private float flashInterval = 0.08f;
+
+    [Tooltip("ระยะเวลาที่หน้าจอจะสั่นตอนโดนโจมตี (วินาที)")]
+    [SerializeField] private float hitShakeDuration = 0.12f;
+
+    [Tooltip("ความแรงของการสั่นหน้าจอตอนโดนโจมตี")]
+    [SerializeField] private float hitShakeMagnitude = 0.04f;
+
     private float invincibleUntil = 0f;
     private bool isDead = false;
     #endregion
@@ -1001,6 +1011,16 @@ public class PlayerController : MonoBehaviour
             UIManager.Instance.ShowCombatText(transform.position, amount, false);
         }
 
+        // 1. สั่นหน้าจอตามค่าที่ตั้งใน Inspector
+        UIManager.Instance?.TriggerScreenShake(hitShakeDuration, hitShakeMagnitude);
+
+        // 2. สั่งให้ตัวละครกะพริบสีแดงและกะพริบหายแว้บๆ ช่วงอมตะ
+        if (spriteRenderer != null)
+        {
+            StopCoroutine(nameof(FlashRedRoutine));
+            StartCoroutine(nameof(FlashRedRoutine));
+        }
+
         Debug.Log($"[Player] โดนดาเมจ {amount} -> เลือดเหลือ {Mathf.Max(currentHP, 0)}/{maxHP}");
         AudioManager.Instance?.PlaySFX("player_hurt");
 
@@ -1009,6 +1029,27 @@ public class PlayerController : MonoBehaviour
             currentHP = 0;
             Die();
         }
+    }
+
+    // Coroutine สำหรับทำเอฟเฟกต์ตัวละครกะพริบสีแดงสลับกับหายแว้บๆ
+    private IEnumerator FlashRedRoutine()
+    {
+        Color originalColor = spriteRenderer.color;
+        float elapsed = 0f;
+
+        while (elapsed < invincibilityDuration)
+        {
+            // เปลี่ยนเป็นสีแดงสลับกับสีปกติ พร้อมซ่อน/แสดงตัวละคร (Blink)
+            spriteRenderer.color = Color.red;
+            spriteRenderer.enabled = !spriteRenderer.enabled;
+
+            yield return new WaitForSeconds(flashInterval);
+            elapsed += flashInterval;
+        }
+
+        // คืนค่าสถานะปกติเมื่อหมดเวลาอมตะ
+        spriteRenderer.enabled = true;
+        spriteRenderer.color = originalColor;
     }
 
     public void Heal(int amount)

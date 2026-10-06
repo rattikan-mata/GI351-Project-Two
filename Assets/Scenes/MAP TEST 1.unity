@@ -216602,12 +216602,24 @@ PrefabInstance:
       value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 6802481599056181250, guid: 003637d8744daad4a956741f8e1d862b, type: 3}
+      propertyPath: flashInterval
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6802481599056181250, guid: 003637d8744daad4a956741f8e1d862b, type: 3}
       propertyPath: firePointOffset
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6802481599056181250, guid: 003637d8744daad4a956741f8e1d862b, type: 3}
       propertyPath: bodyHeightOffset
       value: 0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 6802481599056181250, guid: 003637d8744daad4a956741f8e1d862b, type: 3}
+      propertyPath: hitShakeDuration
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 6802481599056181250, guid: 003637d8744daad4a956741f8e1d862b, type: 3}
+      propertyPath: hitShakeMagnitude
+      value: 0.07
       objectReference: {fileID: 0}
     - target: {fileID: 8236432238528281874, guid: 003637d8744daad4a956741f8e1d862b, type: 3}
       propertyPath: m_LocalScale.x
