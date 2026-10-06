@@ -1,21 +1,9 @@
 using System.Collections;
 using UnityEngine;
 
-/// <summary>
-/// บอส: สืบทอดจาก Monster.cs ทั้งหมด (ใช้ระบบ HP / Stun / Knockback / ไล่ผู้เล่น / Hit Flash / Item Drop เดิม)
-/// เพิ่มระบบสกิล 3 ท่า สุ่มสลับกันตามน้ำหนัก (Weight) แต่ละท่ามี "สีเตือน" (Telegraph) ไม่เหมือนกัน
-/// เพื่อให้ผู้เล่นแยกออกก่อนว่าบอสกำลังจะออกท่าไหน แล้วหลบให้ถูก
-///
-/// ท่า 1) Dash Charge   -> ใช้ระบบพุ่งชนเดิมของ Monster ทั้งชุด (สีเตือน/ความเร็ว/ระยะ ปรับที่ header "Dash Attack" ของ Monster เดิม)
-/// ท่า 2) Projectile Barrage -> ยิงกระสุนกระจายเป็นมุมใส่ทิศผู้เล่น ณ ตอนยิง
-/// ท่า 3) Ground Slam   -> พุ่งเข้าใกล้ผู้เล่นสั้นๆ แล้วฟาดพื้น ทำดาเมจ + ผลักกระเด็นรอบตัวเป็นวงกลม
-///
-/// ใช้สคริปต์นี้ตัวเดียวกันได้ทั้งบอสทั้ง 3 ตัว แค่ทำ Prefab แยกกัน
-/// แล้วตั้งค่า(น้ำหนัก/ดาเมจ/สีเตือน/ความแรง ฯลฯ)ในแต่ละ Prefab ให้ไม่เหมือนกัน จะได้บอสที่เล่นต่างกัน
-/// </summary>
 public class BossController : Monster
 {
-    private enum BossSkill { Dash, ProjectileBarrage, GroundSlam }
+    private enum BossSkill { Dash, ProjectileBarrage, GroundSlam, CrazyDash, TrackingShoot }
 
     #region Boss Info
     [Header("Boss Info")]
@@ -54,31 +42,20 @@ public class BossController : Monster
     private float nextSkillReadyTime = 0f;
     #endregion
 
-    #region Area Indicator (โชว์ขนาดจริงตอน Dash/Slam)
+    #region Area Indicator & Line Indicator
     [Header("Area Indicator (โชว์ขนาดจริงตอน Dash/Slam)")]
-    [Tooltip("ลาก Prefab ที่มี SpriteRenderer มาใส่ ถ้าไม่ใส่จะไม่สปอน")]
     [SerializeField] private GameObject areaIndicatorPrefab;
-
-    [Tooltip("สีที่ย้อมทับ Sprite ตอนโชว์วงของท่า Dash")]
     [SerializeField] private Color dashIndicatorColor = new Color(1f, 0.5f, 0f, 0.5f);
-
-    [Tooltip("สีที่ย้อมทับ Sprite ตอนโชว์วงของท่า Ground Slam")]
     [SerializeField] private Color slamIndicatorColor = new Color(1f, 0f, 0f, 0.5f);
-    #endregion
 
-    #region Line Indicator (เตือนทิศทางล่วงหน้าท่า Projectile Barrage)
     [Header("Line Indicator (เตือนทิศกระสุนล่วงหน้า)")]
-    [Tooltip("ลาก Prefab ที่มี SpriteRenderer เป็นเส้นตรง/สี่เหลี่ยมยาว")]
     [SerializeField] private GameObject lineIndicatorPrefab;
-
-    [Tooltip("ความหนาของเส้นเตือน (หน่วยเกม)")]
     [SerializeField] private float lineIndicatorWidth = 0.3f;
     #endregion
 
     #region 1) Dash Charge
     [Header("1) Dash Charge (ใช้ค่าจาก Header \"Dash Attack\" ของ Monster ด้านบนทั้งหมด)")]
     [SerializeField] private bool dashSkillEnabled = true;
-    [Tooltip("น้ำหนักสุ่มของท่านี้ เทียบกับท่าอื่น")]
     [SerializeField] private float dashWeight = 1f;
     #endregion
 
@@ -86,19 +63,13 @@ public class BossController : Monster
     [Header("2) Projectile Barrage")]
     [SerializeField] private bool projectileSkillEnabled = true;
     [SerializeField] private float projectileWeight = 1f;
-
-    [Tooltip("Prefab กระสุนที่ใช้ยิง (ต้องมี Projectile.cs)")]
     [SerializeField] private GameObject projectilePrefab;
     [SerializeField] private int projectileCount = 6;
-    [Tooltip("มุมกระจายทั้งหมดของชุดกระสุน (องศา)")]
     [SerializeField] private float projectileArcAngle = 60f;
     [SerializeField] private float projectileSpeed = 8f;
     [SerializeField] private int projectileDamage = 8;
     [SerializeField] private float projectileRange = 10f;
-    [Tooltip("แรงผลักผู้เล่นกระเด็นตอนโดนกระสุน (0 = ไม่ผลัก)")]
     [SerializeField] private float projectileKnockbackForce = 4f;
-
-    [Tooltip("สีเตือนก่อนยิงกระสุน")]
     [SerializeField] private Color projectileTelegraphColor = Color.magenta;
     [SerializeField] private float projectileTelegraphDuration = 0.6f;
     [SerializeField] private float projectileBlinkInterval = 0.1f;
@@ -108,24 +79,35 @@ public class BossController : Monster
     [Header("3) Ground Slam")]
     [SerializeField] private bool slamSkillEnabled = true;
     [SerializeField] private float slamWeight = 1f;
-
-    [Tooltip("ความเร็วพุ่งเข้าหาผู้เล่นก่อนฟาดพื้น")]
     [SerializeField] private float slamChargeSpeed = 9f;
-    [Tooltip("ระยะเวลาพุ่งเข้าหาก่อนฟาด (วินาที)")]
     [SerializeField] private float slamChargeDuration = 0.4f;
-
     [SerializeField] private float slamRadius = 2.5f;
     [SerializeField] private int slamDamage = 12;
     [SerializeField] private float slamKnockbackForce = 8f;
-
-    [Tooltip("สีเตือนก่อนฟาดพื้น")]
     [SerializeField] private Color slamTelegraphColor = Color.red;
     [SerializeField] private float slamTelegraphDuration = 0.7f;
     [SerializeField] private float slamBlinkInterval = 0.1f;
-
-    [Tooltip("(ไม่บังคับ) เอฟเฟกต์ตอนฟาดพื้น")]
     [SerializeField] private GameObject slamEffectPrefab;
     [SerializeField] private float slamEffectLifetime = 1f;
+    #endregion
+
+    #region 4) Crazy Dash (ปอบคลั่ง)
+    [Header("4) Crazy Dash (วิ่งคลั่งชนกำแพง)")]
+    [SerializeField] private bool crazyDashEnabled = false;
+    [SerializeField] private float crazyDashWeight = 1f;
+    [SerializeField] private float crazyDashSpeed = 15f;
+    [SerializeField] private float crazyDashWarningTime = 0.5f;
+    [SerializeField] private float crazyDashMaxTime = 3f;
+    [SerializeField] private int crazyDashImpactDamage = 15;
+    [SerializeField] private float crazyDashSelfStunDuration = 2f;
+    #endregion
+
+    #region 5) Tracking Shoot (ยิงตามเป้าทีละนัด)
+    [Header("5) Tracking Shoot (ยิงตามเป้า)")]
+    [SerializeField] private bool trackingShootEnabled = false;
+    [SerializeField] private float trackingShootWeight = 1f;
+    [SerializeField] private int trackingShootCount = 3;
+    [SerializeField] private float trackingShootDelay = 0.4f;
     #endregion
 
     #region Unity Lifecycle & Detection
@@ -154,11 +136,8 @@ public class BossController : Monster
             if (!isPlayerInRadius)
             {
                 isPlayerInRadius = true;
-
-                // แสดงหลอดเลือดบอสบน Canvas กลางจอ
                 UIBossHealthBar.Instance?.ShowBossBar(this, bossName);
 
-                // สั่นหน้าจอแบบนุ่มนวลเฉพาะครั้งแรกที่พบ
                 if (!hasTriggeredShake)
                 {
                     hasTriggeredShake = true;
@@ -168,7 +147,6 @@ public class BossController : Monster
         }
         else
         {
-            // ออกนอกรัศมี ให้ซ่อนแถบเลือด (ไม่รีเซ็ตเลือด)
             if (isPlayerInRadius)
             {
                 isPlayerInRadius = false;
@@ -180,16 +158,8 @@ public class BossController : Monster
     protected override void FixedUpdate()
     {
         if (isDead || playerTransform == null) return;
-
-        if (isKnockedBack)
-        {
-            return;
-        }
-
-        if (isUsingSkill)
-        {
-            return;
-        }
+        if (isKnockedBack) return;
+        if (isUsingSkill) return;
 
         if (isStunned)
         {
@@ -216,9 +186,7 @@ public class BossController : Monster
     #region Damage & Death
     public override void TakeDamage(int amount)
     {
-        base.TakeDamage(amount); // เรียกคำนวณดาเมจ, Hit Flash และตัวเลขดาเมจลอย
-
-        // อัปเดตหลอดเลือดบอสบน Canvas ทันทีที่โดนโจมตี
+        base.TakeDamage(amount); 
         if (UIBossHealthBar.Instance != null)
         {
             UIBossHealthBar.Instance.OnBossTakeDamage(this);
@@ -229,10 +197,7 @@ public class BossController : Monster
     {
         if (isDead) return;
 
-        if (exitPortal != null)
-        {
-            exitPortal.SetActive(true);
-        }
+        if (exitPortal != null) exitPortal.SetActive(true);
 
         if (bossName == "Tani")
         {
@@ -251,32 +216,26 @@ public class BossController : Monster
         bool dashAvailable = dashSkillEnabled && distanceToPlayer <= dashAttackRange;
         bool projectileAvailable = projectileSkillEnabled && projectilePrefab != null;
         bool slamAvailable = slamSkillEnabled;
+        bool crazyDashAvailable = crazyDashEnabled;
+        bool trackingShootAvailable = trackingShootEnabled && projectilePrefab != null;
 
         float totalWeight = 0f;
         if (dashAvailable) totalWeight += Mathf.Max(0f, dashWeight);
         if (projectileAvailable) totalWeight += Mathf.Max(0f, projectileWeight);
         if (slamAvailable) totalWeight += Mathf.Max(0f, slamWeight);
+        if (crazyDashAvailable) totalWeight += Mathf.Max(0f, crazyDashWeight);
+        if (trackingShootAvailable) totalWeight += Mathf.Max(0f, trackingShootWeight);
 
         if (totalWeight <= 0f) return null;
 
         float roll = Random.value * totalWeight;
         float cumulative = 0f;
 
-        if (dashAvailable)
-        {
-            cumulative += Mathf.Max(0f, dashWeight);
-            if (roll <= cumulative) return BossSkill.Dash;
-        }
-        if (projectileAvailable)
-        {
-            cumulative += Mathf.Max(0f, projectileWeight);
-            if (roll <= cumulative) return BossSkill.ProjectileBarrage;
-        }
-        if (slamAvailable)
-        {
-            cumulative += Mathf.Max(0f, slamWeight);
-            if (roll <= cumulative) return BossSkill.GroundSlam;
-        }
+        if (dashAvailable) { cumulative += Mathf.Max(0f, dashWeight); if (roll <= cumulative) return BossSkill.Dash; }
+        if (projectileAvailable) { cumulative += Mathf.Max(0f, projectileWeight); if (roll <= cumulative) return BossSkill.ProjectileBarrage; }
+        if (slamAvailable) { cumulative += Mathf.Max(0f, slamWeight); if (roll <= cumulative) return BossSkill.GroundSlam; }
+        if (crazyDashAvailable) { cumulative += Mathf.Max(0f, crazyDashWeight); if (roll <= cumulative) return BossSkill.CrazyDash; }
+        if (trackingShootAvailable) { cumulative += Mathf.Max(0f, trackingShootWeight); if (roll <= cumulative) return BossSkill.TrackingShoot; }
 
         return null;
     }
@@ -286,8 +245,6 @@ public class BossController : Monster
         isUsingSkill = true;
         rb.linearVelocity = Vector2.zero;
 
-        Debug.Log($"[Boss] {bossName} เตรียมออกท่า: {skill}");
-
         switch (skill)
         {
             case BossSkill.Dash:
@@ -295,13 +252,17 @@ public class BossController : Monster
                 AudioManager.Instance?.PlaySFX("boss_dash");
                 yield return StartCoroutine(DashAttackRoutine());
                 break;
-
             case BossSkill.ProjectileBarrage:
                 yield return StartCoroutine(ProjectileBarrageRoutine());
                 break;
-
             case BossSkill.GroundSlam:
                 yield return StartCoroutine(GroundSlamRoutine());
+                break;
+            case BossSkill.CrazyDash:
+                yield return StartCoroutine(CrazyDashRoutine());
+                break;
+            case BossSkill.TrackingShoot:
+                yield return StartCoroutine(TrackingShootRoutine());
                 break;
         }
 
@@ -319,23 +280,19 @@ public class BossController : Monster
 
         int count = Mathf.Max(1, projectileCount);
         float halfArc = projectileArcAngle * 0.5f;
-
         Vector2[] pelletDirs = new Vector2[count];
         for (int i = 0; i < count; i++)
         {
             float t = (count == 1) ? 0.5f : (float)i / (count - 1);
             float angle = baseAngle - halfArc + (projectileArcAngle * t);
             pelletDirs[i] = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
-
             SpawnLineIndicator(transform.position, pelletDirs[i], projectileRange, lineIndicatorWidth, projectileTelegraphColor, projectileTelegraphDuration);
         }
 
         yield return StartCoroutine(TelegraphFlash(projectileTelegraphColor, projectileTelegraphDuration, projectileBlinkInterval));
-
         if (isDead || isStunned) yield break;
 
         AudioManager.Instance?.PlaySFX("boss_shoot");
-
         for (int i = 0; i < count; i++)
         {
             GameObject projObj = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
@@ -355,7 +312,6 @@ public class BossController : Monster
         SpawnAreaIndicator(targetPos, slamRadius, slamIndicatorColor, totalTelegraphTime);
 
         yield return StartCoroutine(TelegraphFlash(slamTelegraphColor, slamTelegraphDuration, slamBlinkInterval));
-
         if (isDead || isStunned) yield break;
 
         float elapsed = 0f;
@@ -371,7 +327,6 @@ public class BossController : Monster
         if (isDead || isStunned) yield break;
 
         AudioManager.Instance?.PlaySFX("boss_slam");
-
         if (slamEffectPrefab != null)
         {
             GameObject fx = Instantiate(slamEffectPrefab, targetPos, Quaternion.identity);
@@ -379,19 +334,88 @@ public class BossController : Monster
         }
 
         DrawDebugCircle(targetPos, slamRadius, Color.red, 0.75f);
-
         Collider2D[] hits = Physics2D.OverlapCircleAll(targetPos, slamRadius);
         foreach (var hit in hits)
         {
             if (hit.gameObject.CompareTag("Player") && hit.TryGetComponent<PlayerController>(out var player))
             {
                 player.TakeDamage(slamDamage);
-
                 Vector2 dir = ((Vector2)player.transform.position - targetPos).normalized;
                 player.ApplyKnockback(dir, slamKnockbackForce);
-
                 break;
             }
+        }
+    }
+
+    private IEnumerator CrazyDashRoutine()
+    {
+        if (isDead || isStunned || playerTransform == null) yield break;
+
+        yield return StartCoroutine(TelegraphFlash(Color.red, crazyDashWarningTime, 0.05f));
+        if (isDead || isStunned) yield break;
+
+        Vector2 dashDir = ((Vector2)playerTransform.position - (Vector2)transform.position).normalized;
+        AudioManager.Instance?.PlaySFX("monster_dash"); 
+
+        float elapsed = 0f;
+        bool hitObstacle = false;
+
+        while (elapsed < crazyDashMaxTime && !isDead && !isStunned)
+        {
+            rb.linearVelocity = dashDir * crazyDashSpeed;
+            elapsed += Time.fixedDeltaTime;
+
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, dashDir, 1f, LayerMask.GetMask("Default", "Wall", "Obstacle"));
+            if (hit.collider != null && !hit.collider.CompareTag("Player") && !hit.collider.isTrigger)
+            {
+                hitObstacle = true;
+                break; 
+            }
+            yield return new WaitForFixedUpdate();
+        }
+
+        rb.linearVelocity = Vector2.zero;
+
+        if (hitObstacle && !isDead)
+        {
+            AudioManager.Instance?.PlaySFX("boss_slam"); 
+            DrawDebugCircle(transform.position, 2.5f, Color.red, 1f); 
+
+            Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, 2.5f);
+            foreach (var h in hits)
+            {
+                if (h.CompareTag("Player") && h.TryGetComponent<PlayerController>(out var player))
+                {
+                    player.TakeDamage(crazyDashImpactDamage);
+                    player.ApplyKnockback((player.transform.position - transform.position).normalized, 8f);
+                }
+            }
+            ApplyStun(crazyDashSelfStunDuration);
+        }
+    }
+
+    private IEnumerator TrackingShootRoutine()
+    {
+        if (isDead || isStunned || playerTransform == null || projectilePrefab == null) yield break;
+
+        for (int i = 0; i < trackingShootCount; i++)
+        {
+            if (isDead || isStunned) break;
+
+            Vector2 aimDir = ((Vector2)playerTransform.position - (Vector2)transform.position).normalized;
+            float warningTime = trackingShootDelay * 0.5f;
+            SpawnLineIndicator(transform.position, aimDir, projectileRange, lineIndicatorWidth, projectileTelegraphColor, warningTime);
+            yield return StartCoroutine(TelegraphFlash(projectileTelegraphColor, warningTime, 0.05f));
+
+            if (isDead || isStunned) break;
+
+            AudioManager.Instance?.PlaySFX("boss_shoot");
+            GameObject projObj = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+            if (projObj.TryGetComponent<Projectile>(out var projectile))
+            {
+                projectile.Init(aimDir, projectileSpeed, projectileDamage, projectileRange, projectileKnockbackForce);
+            }
+            yield return new WaitForSeconds(trackingShootDelay - warningTime);
         }
     }
 
@@ -399,7 +423,6 @@ public class BossController : Monster
     {
         float elapsed = 0f;
         bool toggleColor = false;
-
         while (elapsed < duration)
         {
             if (!isStunned && !isFlashing && spriteRenderer != null)
@@ -407,12 +430,10 @@ public class BossController : Monster
                 spriteRenderer.color = toggleColor ? telegraphColor : originalColor;
             }
             toggleColor = !toggleColor;
-
             float waitTime = Mathf.Min(blinkInterval, duration - elapsed);
             yield return new WaitForSeconds(waitTime);
             elapsed += waitTime;
         }
-
         if (!isStunned && !isFlashing && spriteRenderer != null)
         {
             spriteRenderer.color = originalColor;
@@ -439,13 +460,10 @@ public class BossController : Monster
     private void SpawnAreaIndicator(Vector3 position, float radius, Color tint, float duration)
     {
         if (areaIndicatorPrefab == null || radius <= 0f) return;
-
         GameObject obj = Instantiate(areaIndicatorPrefab, position, Quaternion.identity);
-
         if (obj.TryGetComponent<SpriteRenderer>(out var sr))
         {
             sr.color = tint;
-
             float nativeWidth = (sr.sprite != null) ? sr.sprite.bounds.size.x : 1f;
             if (nativeWidth > 0.0001f)
             {
@@ -460,16 +478,12 @@ public class BossController : Monster
     {
         if (lineIndicatorPrefab == null || length <= 0f) return;
         if (direction.sqrMagnitude < 0.0001f) return;
-
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         Vector3 midPoint = origin + (Vector3)(direction.normalized * (length * 0.5f));
-
         GameObject obj = Instantiate(lineIndicatorPrefab, midPoint, Quaternion.Euler(0f, 0f, angle));
-
         if (obj.TryGetComponent<SpriteRenderer>(out var sr))
         {
             sr.color = tint;
-
             Vector2 nativeSize = (sr.sprite != null) ? (Vector2)sr.sprite.bounds.size : Vector2.one;
             float scaleX = (nativeSize.x > 0.0001f) ? length / nativeSize.x : 1f;
             float scaleY = (nativeSize.y > 0.0001f) ? width / nativeSize.y : 1f;
@@ -481,7 +495,6 @@ public class BossController : Monster
     private void DrawDebugCircle(Vector2 center, float radius, Color color, float duration, int segments = 24)
     {
         if (radius <= 0f) return;
-
         Vector3 prevPoint = center + new Vector2(radius, 0f);
         for (int i = 1; i <= segments; i++)
         {
