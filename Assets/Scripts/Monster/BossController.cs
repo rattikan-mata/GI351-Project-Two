@@ -108,6 +108,12 @@ public class BossController : Monster
     [SerializeField] private float crazyDashMaxTime = 3f;
     [SerializeField] private int crazyDashImpactDamage = 15;
     [SerializeField] private float crazyDashSelfStunDuration = 2f;
+
+    [Header("Dash Projectiles (ยิงตอนพุ่ง)")]
+    [Tooltip("ยิงกระสุนออกด้านข้างกี่นัดต่อวินาที (ถ้าใส่ 0 คือไม่ยิง)")]
+    [SerializeField] private float dashProjectilesPerSecond = 5f;
+    [Tooltip("องศาแบบสุ่มที่กระจายออกไป (เช่น 30 คือสุ่มเบี่ยงซ้ายขวาไม่เกิน 15 องศา)")]
+    [SerializeField] private float dashProjectileSpreadAngle = 30f;
     #endregion
 
     #region 5) Tracking Shoot (ยิงตามเป้าทีละนัด)
@@ -373,18 +379,28 @@ public class BossController : Monster
 
         Vector2 dashDir = ((Vector2)playerTransform.position - (Vector2)transform.position).normalized;
 
-        // <--- เพิ่มตรงนี้ (เสียงตอนพุ่ง) --->
         AudioManager.Instance?.PlaySFX("boss_dash");
 
         float elapsed = 0f;
         bool hitObstacle = false;
+
+        // คำนวณรอบการยิงกระสุนออกสองข้าง
+        float fireInterval = dashProjectilesPerSecond > 0f ? 1f / dashProjectilesPerSecond : 999f;
+        float nextFireTime = Time.time;
 
         while (elapsed < crazyDashMaxTime && !isDead && !isStunned)
         {
             rb.linearVelocity = dashDir * crazyDashSpeed;
             elapsed += Time.fixedDeltaTime;
 
-            // --- เพิ่มการเช็กดาเมจตอนวิ่งชนผู้เล่นระหว่างทางตรงนี้ ---
+            // --- ระบบยิงกระสุนออก 2 ข้างระหว่างวิ่ง ---
+            if (dashProjectilesPerSecond > 0f && Time.time >= nextFireTime && projectilePrefab != null)
+            {
+                FireDashProjectiles(dashDir);
+                nextFireTime = Time.time + fireInterval;
+            }
+            // ------------------------------------
+
             Collider2D[] runHits = Physics2D.OverlapCircleAll(transform.position, 1.2f);
             foreach (var h in runHits)
             {
@@ -392,11 +408,10 @@ public class BossController : Monster
                 {
                     player.TakeDamage(crazyDashImpactDamage);
                     player.ApplyKnockback(dashDir, 8f);
-                    hitObstacle = true; // ชนผู้เล่นแล้วให้ถือว่าหยุดพุ่งด้วย (หรือจะปล่อยให้วิ่งต่อก็ได้)
+                    hitObstacle = true;
                     break;
                 }
             }
-            // ----------------------------------------------------
 
             RaycastHit2D hit = Physics2D.Raycast(transform.position, dashDir, 1f, LayerMask.GetMask("Default", "Wall", "Obstacle"));
             if (hit.collider != null && !hit.collider.CompareTag("Player") && !hit.collider.isTrigger)
@@ -411,7 +426,6 @@ public class BossController : Monster
 
         if (hitObstacle && !isDead)
         {
-            // <--- เพิ่มตรงนี้ (เสียงตอนชนกำแพงตู้ม) --->
             AudioManager.Instance?.PlaySFX("boss_slam");
 
             DrawDebugCircle(transform.position, 2.5f, Color.red, 1f);
@@ -426,6 +440,37 @@ public class BossController : Monster
                 }
             }
             ApplyStun(crazyDashSelfStunDuration);
+        }
+    }
+
+    // ฟังก์ชันใหม่: คำนวณและยิงกระสุนออกซ้าย-ขวาแบบตั้งฉาก
+    private void FireDashProjectiles(Vector2 dashDirection)
+    {
+        // คำนวณทิศตั้งฉาก 90 องศา ซ้ายและขวาจากทิศที่กำลังพุ่ง
+        Vector2 leftDir = new Vector2(-dashDirection.y, dashDirection.x);
+        Vector2 rightDir = new Vector2(dashDirection.y, -dashDirection.x);
+
+        // สุ่มองศาเบี่ยงเบน
+        float halfSpread = dashProjectileSpreadAngle / 2f;
+        float randomAngleLeft = Random.Range(-halfSpread, halfSpread);
+        float randomAngleRight = Random.Range(-halfSpread, halfSpread);
+
+        // หมุนทิศทางตามองศาที่สุ่มได้
+        Vector2 finalLeft = Quaternion.Euler(0, 0, randomAngleLeft) * leftDir;
+        Vector2 finalRight = Quaternion.Euler(0, 0, randomAngleRight) * rightDir;
+
+        // ยิงกระสุนซ้าย (ใช้ค่าเดียวกับ Projectile Barrage)
+        GameObject pLeft = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+        if (pLeft.TryGetComponent<Projectile>(out var projL))
+        {
+            projL.Init(finalLeft.normalized, projectileSpeed, projectileDamage, projectileRange, projectileKnockbackForce);
+        }
+
+        // ยิงกระสุนขวา (ใช้ค่าเดียวกับ Projectile Barrage)
+        GameObject pRight = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+        if (pRight.TryGetComponent<Projectile>(out var projR))
+        {
+            projR.Init(finalRight.normalized, projectileSpeed, projectileDamage, projectileRange, projectileKnockbackForce);
         }
     }
 
@@ -444,7 +489,6 @@ public class BossController : Monster
 
             if (isDead || isStunned) break;
 
-            // <--- เพิ่มตรงนี้ (เสียงตอนยิงกระสุนแต่ละนัด) --->
             AudioManager.Instance?.PlaySFX("boss_shoot");
 
             GameObject projObj = Instantiate(projectilePrefab, transform.position, Quaternion.identity);

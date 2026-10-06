@@ -286,6 +286,8 @@ MonoBehaviour:
   crazyDashMaxTime: 3
   crazyDashImpactDamage: 10
   crazyDashSelfStunDuration: 2
+  dashProjectilesPerSecond: 2
+  dashProjectileSpreadAngle: 45
   trackingShootEnabled: 1
   trackingShootWeight: 1
   trackingShootCount: 6
