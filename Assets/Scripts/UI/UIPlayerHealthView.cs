@@ -41,7 +41,7 @@ public class UIPlayerHealthView : MonoBehaviour
         {
             float intensity = 1f - (ratio / lowHpThreshold);
             float pulse = (Mathf.Sin(Time.time * pulseSpeed) + 1f) * 0.5f;
-            float alpha = Mathf.Lerp(0.15f, 0.65f, intensity * pulse);
+            float alpha = Mathf.Lerp(0.3f, 0.7f, intensity * pulse);
 
             Color c = vignetteImage.color;
             c.a = alpha;

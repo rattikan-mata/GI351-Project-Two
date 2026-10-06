@@ -144080,8 +144080,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UIPlayerHealthView
   playerScrollbar: {fileID: 1080980434}
   vignetteImage: {fileID: 1576759508}
-  lowHpThreshold: 0.3
-  pulseSpeed: 4
+  lowHpThreshold: 0.35
+  pulseSpeed: 8
 --- !u!114 &1462060438
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -144694,14 +144694,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.4666667, g: 0.18039216, b: 0.19607845, a: 1}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -6951105996533738602, guid: 7f509fc80b4f8b34c8a93721b08f25b9, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e290c2fa71df76848bcd344533185e9c, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
