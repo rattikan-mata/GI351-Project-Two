@@ -12407,8 +12407,7 @@ MonoBehaviour:
   endingSceneName: Endding
   errorMessage: "\u0E1B\u0E23\u0E30\u0E15\u0E39\u0E25\u0E47\u0E2D\u0E04\u0E2D\u0E22\u0E39\u0E48! "
   messageDuration: 2
-  successMessage: "\u0E44\u0E02\u0E01\u0E38\u0E0D\u0E41\u0E08\u0E2A\u0E33\u0E40\u0E23\u0E47\u0E08!
-    \u0E01\u0E33\u0E25\u0E31\u0E07\u0E44\u0E1B\u0E09\u0E32\u0E01\u0E08\u0E1A..."
+  successMessage: 
   successDuration: 1.5
 --- !u!114 &582953723
 MonoBehaviour:
@@ -37618,7 +37617,7 @@ MonoBehaviour:
   destination: {fileID: 807588742}
   requiredCondition: 0
   errorMessage: 
-  successMessage: "\u0E44\u0E02\u0E01\u0E38\u0E0D\u0E41\u0E08\u0E1A\u0E49\u0E32\u0E19\u0E2A\u0E33\u0E40\u0E23\u0E47\u0E08!"
+  successMessage: "\u0E23\u0E30\u0E27\u0E31\u0E07 !"
 --- !u!61 &1036101067
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -38806,7 +38805,7 @@ MonoBehaviour:
   destination: {fileID: 664868492}
   requiredCondition: 1
   errorMessage: "\u0E16\u0E39\u0E01\u0E23\u0E32\u0E01\u0E44\u0E21\u0E49\u0E41\u0E21\u0E48\u0E15\u0E32\u0E19\u0E35\u0E2B\u0E49\u0E32\u0E21\u0E40\u0E02\u0E49\u0E32!"
-  successMessage: "\u0E44\u0E02\u0E01\u0E38\u0E0D\u0E41\u0E08\u0E1A\u0E49\u0E32\u0E19\u0E2A\u0E33\u0E40\u0E23\u0E47\u0E08!"
+  successMessage: "\u0E15\u0E32\u0E22 !"
 --- !u!114 &1098889142
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -144947,18 +144946,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: "\u0E01\u0E25\u0E49\u0E27\u0E22\u0E1A\u0E2D\u0E2A (5)"
       objectReference: {fileID: 0}
-    - target: {fileID: 3638169209076821496, guid: 77daff20110d2b9489c855a28d86dfd3, type: 3}
-      propertyPath: m_Layer
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 4281461799733382697, guid: 77daff20110d2b9489c855a28d86dfd3, type: 3}
-      propertyPath: m_Layer
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 5184496299362296858, guid: 77daff20110d2b9489c855a28d86dfd3, type: 3}
-      propertyPath: m_Layer
-      value: 8
-      objectReference: {fileID: 0}
     - target: {fileID: 5359354029229086758, guid: 77daff20110d2b9489c855a28d86dfd3, type: 3}
       propertyPath: m_LocalPosition.x
       value: 20.217901
@@ -144998,6 +144985,10 @@ PrefabInstance:
     - target: {fileID: 5359354029229086758, guid: 77daff20110d2b9489c855a28d86dfd3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6473847750705919214, guid: 77daff20110d2b9489c855a28d86dfd3, type: 3}
+      propertyPath: m_SortingOrder
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

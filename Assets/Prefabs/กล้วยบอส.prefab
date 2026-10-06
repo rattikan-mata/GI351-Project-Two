@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5359354029229086758}
   - component: {fileID: 7609728974060250761}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: "\u0E01\u0E25\u0E49\u0E27\u0E22\u0E1A\u0E2D\u0E2A"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25,7 +25,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3638169209076821496}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -51.78, y: 95.24, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -90,7 +90,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8674269236303271119}
   - component: {fileID: 7963989483130531778}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: "\u0E01\u0E25\u0E49\u0E27\u0E22\u0E2A\u0E27\u0E19 2_0"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -182,7 +182,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6267738166355308895}
   - component: {fileID: 6473847750705919214}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Sprite-0001-Sheet (1)_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -251,7 +251,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 3
+  m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: -3358290282463493344, guid: fad9d46e3a3e3ec43a840de82b468764, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
