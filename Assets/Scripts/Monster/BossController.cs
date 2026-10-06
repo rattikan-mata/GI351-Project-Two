@@ -219,9 +219,9 @@ public class BossController : Monster
 
         if (exitPortal != null) exitPortal.SetActive(true);
 
-        if (bossName == "Tani")
+        if (bossName == "Tanee")
         {
-            StoryManager.Instance.isTaniDefeated = true;
+            StoryManager.Instance.isTaneeDefeated = true;
             Debug.Log("ปลดล็อกวาร์ปคอกวัวแล้ว!");
         }
 

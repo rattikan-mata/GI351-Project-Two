@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -1072,6 +1073,9 @@ public class PlayerController : MonoBehaviour
         currentVelocity = Vector2.zero;
         Debug.Log("[Player] Died.");
         AudioManager.Instance?.PlaySFX("player_die");
+
+        // สั่งเปลี่ยนไปซีน GameOver
+        SceneManager.LoadScene("GameOver");
     }
     #endregion
 }

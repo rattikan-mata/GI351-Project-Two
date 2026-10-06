@@ -31,7 +31,7 @@ public class EndingMenuController : MonoBehaviour
     {
         if (StoryManager.Instance != null)
         {
-            StoryManager.Instance.isTaniDefeated = false;
+            StoryManager.Instance.isTaneeDefeated = false;
             StoryManager.Instance.hasHouseKey = false;
         }
     }

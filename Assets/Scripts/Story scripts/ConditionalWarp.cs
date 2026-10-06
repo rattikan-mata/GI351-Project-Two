@@ -32,7 +32,7 @@ public class ConditionalWarp : MonoBehaviour
     private void TryWarp()
     {
         // เช็คเงื่อนไข
-        if (requiredCondition == WarpType.RequireTaniDefeated && !StoryManager.Instance.isTaniDefeated)
+        if (requiredCondition == WarpType.RequireTaniDefeated && !StoryManager.Instance.isTaneeDefeated)
         {
             // เงื่อนไขไม่ผ่าน: โชว์ข้อความเตือน (ตรงนี้คุณอาจจะทำ UI Text ลอยขึ้นมา หรือใช้ Debug.Log ไปก่อน)
             Debug.Log(errorMessage);

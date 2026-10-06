@@ -5,7 +5,7 @@ public class StoryManager : MonoBehaviour
     public static StoryManager Instance { get; private set; }
 
     // ตัวแปรจำสถานะต่างๆ
-    public bool isTaniDefeated = false;
+    public bool isTaneeDefeated = false;
     public bool hasHouseKey = false;
 
     private void Awake()

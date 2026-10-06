@@ -3,7 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(Collider2D))]
 public class LocalConditionalWarp : MonoBehaviour
 {
-    public enum WarpType { Normal, RequireTaniDefeated, RequireHouseKey }
+    public enum WarpType { Normal, RequireTaneeDefeated, RequireHouseKey }
 
     [Header("Warp Destination")]
     [Tooltip("ลาก Empty GameObject ที่เป็นจุดปลายทางมาใส่ตรงนี้")]
@@ -45,7 +45,7 @@ public class LocalConditionalWarp : MonoBehaviour
         }
 
         // เช็คเงื่อนไขที่ 1: ต้องตีตานีก่อน
-        if (requiredCondition == WarpType.RequireTaniDefeated && !StoryManager.Instance.isTaniDefeated)
+        if (requiredCondition == WarpType.RequireTaneeDefeated && !StoryManager.Instance.isTaneeDefeated)
         {
             UIManager.Instance?.ShowWarpMessage(errorMessage);
             return;
