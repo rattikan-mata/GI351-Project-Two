@@ -3,7 +3,6 @@ using UnityEngine;
 [RequireComponent(typeof(Collider2D))]
 public class LocalConditionalWarp : MonoBehaviour
 {
-    // เพิ่มเงื่อนไขกุญแจบ้านเข้ามาให้ด้วยเลยครับ
     public enum WarpType { Normal, RequireTaniDefeated, RequireHouseKey }
 
     [Header("Warp Destination")]
@@ -12,10 +11,13 @@ public class LocalConditionalWarp : MonoBehaviour
 
     [Header("Warp Settings")]
     public WarpType requiredCondition = WarpType.Normal;
-    
-    [Header("Error Message")]
+
+    [Header("Messages")]
     [Tooltip("ข้อความที่จะขึ้นถ้าเงื่อนไขไม่ผ่าน")]
     public string errorMessage = "เข้าไม่ได้!";
+
+    [Tooltip("ข้อความที่จะขึ้นตอนผ่านเงื่อนไข/ไขกุญแจสำเร็จ")]
+    public string successMessage = "ไขกุญแจบ้านสำเร็จ!";
 
     private bool playerInRange = false;
     private GameObject playerRef; // เอาไว้จำตัวผู้เล่นตอนเดินมาเหยียบ
@@ -45,21 +47,27 @@ public class LocalConditionalWarp : MonoBehaviour
         // เช็คเงื่อนไขที่ 1: ต้องตีตานีก่อน
         if (requiredCondition == WarpType.RequireTaniDefeated && !StoryManager.Instance.isTaniDefeated)
         {
-            Debug.Log(errorMessage);
-            return;
-        }
-        
-        // เช็คเงื่อนไขที่ 2: ต้องมีกุญแจบ้าน
-        if (requiredCondition == WarpType.RequireHouseKey && !StoryManager.Instance.hasHouseKey)
-        {
-            Debug.Log(errorMessage);
+            UIManager.Instance?.ShowWarpMessage(errorMessage);
             return;
         }
 
-        // เงื่อนไขผ่าน: ย้ายตำแหน่งผู้เล่นไปที่จุดหมาย (วาร์ปในฉากเดียวกัน)
+        // เช็คเงื่อนไขที่ 2: ต้องมีกุญแจบ้าน
+        if (requiredCondition == WarpType.RequireHouseKey && !StoryManager.Instance.hasHouseKey)
+        {
+            UIManager.Instance?.ShowWarpMessage(errorMessage);
+            return;
+        }
+
+        // เงื่อนไขผ่าน (รวมถึงกรณีใช้กุญแจบ้านสำเร็จ): โชว์ข้อความสำเร็จก่อนวาร์ป
+        if (!string.IsNullOrEmpty(successMessage))
+        {
+            UIManager.Instance?.ShowWarpMessage(successMessage);
+        }
+
+        // ย้ายตำแหน่งผู้เล่นไปที่จุดหมาย (วาร์ปในฉากเดียวกัน)
         playerRef.transform.position = destination.position;
-        
-        // เล่นเสียงวาร์ป (เปลี่ยนชื่อเสียงได้ตามต้องการ)
+
+        // เล่นเสียงวาร์ป (เปิดใช้คอมเมนต์ด้านล่างนี้ได้ถ้ามีระบบเสียง)
         // AudioManager.Instance?.PlaySFX("warp_sound"); 
     }
 

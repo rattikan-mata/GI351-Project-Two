@@ -1,5 +1,7 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class UIManager : MonoBehaviour
 {
@@ -11,6 +13,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private UIPauseMenuView pauseMenuView;
     [SerializeField] private UICameraEffect cameraEffect;
     [SerializeField] private UICombatTextSpawner combatTextSpawner;
+
+    [Header("Warp & Door Notification")]
+    [SerializeField] private TextMeshProUGUI warpMessageText;
+    private Coroutine warpMessageCoroutine;
 
     [Header("Scene Settings")]
     [SerializeField] private string mainMenuSceneName = "MainMenu";
@@ -26,6 +32,11 @@ public class UIManager : MonoBehaviour
             return;
         }
         Instance = this;
+
+        if (warpMessageText != null)
+        {
+            warpMessageText.gameObject.SetActive(false);
+        }
     }
 
     private void Start()
@@ -123,5 +134,23 @@ public class UIManager : MonoBehaviour
     public void TriggerScreenShake(float duration = 3f, float magnitude = 0.25f)
     {
         if (cameraEffect != null) cameraEffect.Shake(duration, magnitude);
+    }
+
+    public void ShowWarpMessage(string message, float duration = 2f)
+    {
+        if (warpMessageText == null) return;
+
+        warpMessageText.text = message;
+        warpMessageText.gameObject.SetActive(true);
+
+        if (warpMessageCoroutine != null) StopCoroutine(warpMessageCoroutine);
+        warpMessageCoroutine = StartCoroutine(HideMessageAfterSeconds(duration));
+    }
+
+    private IEnumerator HideMessageAfterSeconds(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (warpMessageText != null) warpMessageText.gameObject.SetActive(false);
+        warpMessageCoroutine = null;
     }
 }
