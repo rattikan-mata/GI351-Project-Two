@@ -38637,7 +38637,7 @@ PolygonCollider2D:
     - - {x: 28.428787, y: 13.450409}
       - {x: 28.376696, y: 7.4878693}
       - {x: 31.595453, y: 7.4867096}
-      - {x: 31.554623, y: 3.0194168}
+      - {x: 31.606884, y: 3.367836}
       - {x: 35.882572, y: 16.26339}
       - {x: -1.2820015, y: 15.776756}
       - {x: -0.95105654, y: 0.30901697}
@@ -41039,6 +41039,13 @@ MonoBehaviour:
     pitchVariance: 0
   - id: boss_slam
     clip: {fileID: 8300000, guid: d8968db0628096e4daa3a22a288ad225, type: 3}
+    randomClips: []
+    volume: 0.2
+    pitch: 1
+    randomizePitch: 0
+    pitchVariance: 0
+  - id: boss_encounter
+    clip: {fileID: 8300000, guid: cf42095d27963ab4fb13f7e20ddae402, type: 3}
     randomClips: []
     volume: 0.2
     pitch: 1

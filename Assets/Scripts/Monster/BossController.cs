@@ -155,7 +155,13 @@ public class BossController : Monster
                 if (!hasTriggeredShake)
                 {
                     hasTriggeredShake = true;
+                    // โค้ดเดิมที่สั่งให้จอสั่น
                     UIManager.Instance?.TriggerScreenShake(encounterShakeDuration, encounterShakeMagnitude);
+
+                    // --------------------------------------------------
+                    // เพิ่มโค้ดเล่นเสียงตอนเจอบอสตรงนี้ครับ!
+                    AudioManager.Instance?.PlaySFX("boss_encounter");
+                    // --------------------------------------------------
                 }
             }
         }
