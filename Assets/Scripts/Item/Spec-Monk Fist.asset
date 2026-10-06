@@ -21,7 +21,7 @@ MonoBehaviour:
   amount: 1
   summonPrefab: {fileID: 0}
   summonOffset: {x: -1, y: 0}
-  maxDurability: 20
+  maxDurability: 5
   durabilityLossPerUse: 1
   useCooldown: 0.5
   damage: 15

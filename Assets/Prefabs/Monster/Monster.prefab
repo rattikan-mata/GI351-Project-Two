@@ -380,8 +380,8 @@ MonoBehaviour:
   contactDamage: 15
   attackCooldown: 0.5
   attackKnockbackForce: 5
-  dashAttackRange: 3.4
-  dashSpeed: 10
+  dashAttackRange: 4
+  dashSpeed: 15
   dashDuration: 0.3
   dashRecoveryTime: 0.7
   warningColor: {r: 1, g: 0, b: 0.08972883, a: 1}
