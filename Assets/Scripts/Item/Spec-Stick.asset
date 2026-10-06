@@ -50,7 +50,7 @@ MonoBehaviour:
   arcLockMovement: 0
   sniperProjectilePrefab: {fileID: 1643082123348804430, guid: 711f39ed7a2d7be47a74b96afec749b6, type: 3}
   sniperSpeed: 20
-  sniperRange: 15
+  sniperRange: 7
   explosionRadius: 2
   explodeAtMaxRange: 1
   explosionEffectPrefab: {fileID: 0}

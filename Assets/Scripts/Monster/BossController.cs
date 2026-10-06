@@ -216,6 +216,16 @@ public class BossController : Monster
         UIBossHealthBar.Instance?.HideBossBar(this);
         base.Die();
     }
+
+
+    // บล็อกแรงกระแทกโดยการบังคับไม่ให้ตัวแปรสถานะกระแทกทำงาน
+    public new void ApplyKnockback(Vector2 direction, float force)
+    {
+        // บังคับเซ็ตค่าสถานะกระแทกของบอสให้เป็น false เสมอ บอสจะไม่ปลิว
+        isKnockedBack = false;
+        rb.linearVelocity = Vector2.zero;
+    }
+
     #endregion
 
     #region Skill System
