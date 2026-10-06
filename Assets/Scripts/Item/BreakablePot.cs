@@ -2,21 +2,32 @@ using UnityEngine;
 
 public class BreakablePot : MonoBehaviour, IDamageable
 {
+    [System.Serializable]
+    public class DropItem
+    {
+        [Tooltip("ข้อมูลไอเทม")]
+        public ItemData itemData;
+
+        [Tooltip("โอกาสดรอปเทียบกับชิ้นอื่น")]
+        public float dropWeight = 1f;
+    }
+
     [Header("Pot Stats")]
     [SerializeField] private int maxHealth = 10;
     private int currentHealth;
 
     [Header("Drop Settings")]
-    [Tooltip("รายชื่อ ItemData ที่ไหใบนี้มีโอกาสสุ่มดรอป")]
-    [SerializeField] private ItemData[] possibleDrops;
+    [Tooltip("รายชื่อไอเทมและเรตการดรอป")]
+    [SerializeField] private DropItem[] possibleDrops;
 
-    [Tooltip("Prefab ของ WorldItem สำหรับสร้างไอเทมบนพื้น (ลาก WorldItem Prefab มาใส่)")]
+    [Tooltip("น้ำหนักโอกาสที่จะ 'ไม่ดรอปอะไรเลย' (ค่ายิ่งเยอะ ยิ่งมีโอกาสตีแล้วไหเปล่าๆ สูง ถ้าใส่ 0 คือดรอปชัวร์ทุกใบ)")]
+    [SerializeField] private float nothingDropWeight = 1f;
+
+    [Tooltip("Prefab ของ WorldItem สำหรับสร้างไอเทมบนพื้น")]
     [SerializeField] private GameObject worldItemPrefab;
 
     [Header("Effect & Sound")]
-    [Tooltip("เอฟเฟกต์ตอนไหแตก (ถ้ามี)")]
     [SerializeField] private GameObject breakEffectPrefab;
-    [Tooltip("ชื่อเสียงตอนไหแตก")]
     [SerializeField] private string breakSoundId = "pot_break";
 
     private void Awake()
@@ -24,7 +35,6 @@ public class BreakablePot : MonoBehaviour, IDamageable
         currentHealth = maxHealth;
     }
 
-    // ฟังก์ชันรับดาเมจตามระบบ IDamageable ของเกม
     public void TakeDamage(int amount)
     {
         currentHealth -= amount;
@@ -36,37 +46,66 @@ public class BreakablePot : MonoBehaviour, IDamageable
 
     private void BreakPot()
     {
-        // 1. เล่นเสียงไหแตก
         if (!string.IsNullOrEmpty(breakSoundId))
         {
             AudioManager.Instance?.PlaySFXAtPoint(breakSoundId, transform.position);
         }
 
-        // 2. สร้างเอฟเฟกต์ไหแตก (ถ้ามี)
         if (breakEffectPrefab != null)
         {
             GameObject fx = Instantiate(breakEffectPrefab, transform.position, Quaternion.identity);
             Destroy(fx, 1.5f);
         }
 
-        // 3. สุ่มดรอปไอเทม (ถ้ามีรายการไอเทมและมี Prefab รองรับ)
-        if (possibleDrops != null && possibleDrops.Length > 0 && worldItemPrefab != null)
+        ItemData droppedData = GetRandomDrop();
+        if (droppedData != null && worldItemPrefab != null)
         {
-            // สุ่มเลือกไอเทม 1 ชนิดจากลิสต์
-            ItemData droppedData = possibleDrops[Random.Range(0, possibleDrops.Length)];
-            if (droppedData != null)
+            GameObject itemObj = Instantiate(worldItemPrefab, transform.position, Quaternion.identity);
+            if (itemObj.TryGetComponent<WorldItem>(out var worldItem))
             {
-                // สปอน WorldItem ออกมาที่ตำแหน่งของไห
-                GameObject itemObj = Instantiate(worldItemPrefab, transform.position, Quaternion.identity);
-                if (itemObj.TryGetComponent<WorldItem>(out var worldItem))
-                {
-                    // เซ็ตข้อมูลไอเทมและค่าความทนทานเต็มให้ WorldItem
-                    worldItem.Setup(droppedData);
-                }
+                worldItem.Setup(droppedData);
             }
         }
 
-        // 4. ทำลายตัวไหทิ้ง
         Destroy(gameObject);
+    }
+
+    private ItemData GetRandomDrop()
+    {
+        if (possibleDrops == null || possibleDrops.Length == 0) return null;
+
+        float totalWeight = Mathf.Max(0f, nothingDropWeight);
+        foreach (var drop in possibleDrops)
+        {
+            if (drop.itemData != null && drop.dropWeight > 0f)
+            {
+                totalWeight += drop.dropWeight;
+            }
+        }
+
+        if (totalWeight <= 0f) return null;
+
+        float roll = Random.value * totalWeight;
+
+        // ถ้ารอยสุ่มตกอยู่ในช่วงของ nothingDropWeight จะคืนค่าเป็น null (ไม่ดรอปของ)
+        if (roll < Mathf.Max(0f, nothingDropWeight))
+        {
+            return null;
+        }
+
+        float cumulative = Mathf.Max(0f, nothingDropWeight);
+
+        foreach (var drop in possibleDrops)
+        {
+            if (drop.itemData == null || drop.dropWeight <= 0f) continue;
+
+            cumulative += drop.dropWeight;
+            if (roll <= cumulative)
+            {
+                return drop.itemData;
+            }
+        }
+
+        return null;
     }
 }
