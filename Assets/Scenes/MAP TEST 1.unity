@@ -37242,6 +37242,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 1827637734}
     m_Modifications:
     - target: {fileID: 3947532312628791833, guid: 5ca50c28f7c2de94eaf8ab55a0d38357, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.0619
+      objectReference: {fileID: 0}
+    - target: {fileID: 3947532312628791833, guid: 5ca50c28f7c2de94eaf8ab55a0d38357, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.0619
+      objectReference: {fileID: 0}
+    - target: {fileID: 3947532312628791833, guid: 5ca50c28f7c2de94eaf8ab55a0d38357, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.0619
+      objectReference: {fileID: 0}
+    - target: {fileID: 3947532312628791833, guid: 5ca50c28f7c2de94eaf8ab55a0d38357, type: 3}
       propertyPath: m_LocalPosition.x
       value: 23.92
       objectReference: {fileID: 0}
@@ -155193,7 +155205,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4141860761304923094, guid: c9907f14e54a2fc47bb22cfd03ea6508, type: 3}
       propertyPath: dropChance
-      value: 0.488
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4345093713609307381, guid: c9907f14e54a2fc47bb22cfd03ea6508, type: 3}
       propertyPath: m_AnchorMax.y
