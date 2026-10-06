@@ -354,7 +354,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6e3c54e26736c64db507103f4d2a9fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Monster
-  maxHP: 20
+  maxHP: 40
   healthBar: {fileID: 3836131174859905618}
   moveSpeed: 3
   detectionRange: 7
@@ -365,7 +365,7 @@ MonoBehaviour:
   stunColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   stunDuration: 1
   knockbackDuration: 0.15
-  dropChance: 1
+  dropChance: 0.308
   worldItemPrefab: {fileID: 7194281834610975454, guid: f93c9abf2450f2d458eb57dcccc24b6b, type: 3}
   dropTable:
   - item: {fileID: 11400000, guid: f5cb365cbbb268446befdbf19528d9a7, type: 2}
@@ -377,12 +377,12 @@ MonoBehaviour:
   - item: {fileID: 11400000, guid: 2f676423b679ee1408567e8eaadb409c, type: 2}
     weight: 1
   dropItemPrefab: {fileID: 0}
-  contactDamage: 4
+  contactDamage: 15
   attackCooldown: 1
   attackKnockbackForce: 5
-  dashAttackRange: 2.6
+  dashAttackRange: 2.7
   dashSpeed: 10
-  dashDuration: 0.25
+  dashDuration: 0.3
   dashRecoveryTime: 1.5
   warningColor: {r: 1, g: 0, b: 0.08972883, a: 1}
   warningDuration: 1.2

@@ -21,7 +21,7 @@ MonoBehaviour:
   amount: 1
   summonPrefab: {fileID: 0}
   summonOffset: {x: -1, y: 0}
-  maxDurability: 2
+  maxDurability: 1
   durabilityLossPerUse: 1
   useCooldown: 1
   damage: 0
@@ -63,6 +63,6 @@ MonoBehaviour:
   fragmentAngleOffset: 0
   fragmentSpawnOffset: 0
   fragmentsIgnoreDirectTarget: 0
-  healTotalAmount: 10
+  healTotalAmount: 40
   healDuration: 5
   healTickInterval: 0.5

@@ -212,7 +212,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6e3c54e26736c64db507103f4d2a9fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Monster
-  maxHP: 30
+  maxHP: 50
   healthBar: {fileID: 649458585622112306}
   moveSpeed: 4
   detectionRange: 7
@@ -223,7 +223,7 @@ MonoBehaviour:
   stunColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   stunDuration: 1.5
   knockbackDuration: 0.15
-  dropChance: 1
+  dropChance: 0.336
   worldItemPrefab: {fileID: 7194281834610975454, guid: f93c9abf2450f2d458eb57dcccc24b6b, type: 3}
   dropTable:
   - item: {fileID: 11400000, guid: f5cb365cbbb268446befdbf19528d9a7, type: 2}

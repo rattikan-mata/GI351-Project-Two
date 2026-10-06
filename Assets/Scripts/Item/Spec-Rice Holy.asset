@@ -24,8 +24,8 @@ MonoBehaviour:
   maxDurability: 10
   durabilityLossPerUse: 1
   useCooldown: 0.5
-  damage: 40
-  knockbackForce: 6
+  damage: 5
+  knockbackForce: 1
   stunDuration: 0
   meleeRange: 0
   punchMaxTargets: 1

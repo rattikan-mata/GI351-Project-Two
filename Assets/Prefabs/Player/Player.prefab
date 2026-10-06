@@ -31,11 +31,11 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
   m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 3456558452579545059}
   - {fileID: 792233066855270095}
+  - {fileID: 5390894687556421082}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &4195069576502474560
@@ -85,7 +85,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: -1
+  m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 2e68488c6b3816e48b4fae59d8251b8a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -137,26 +137,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 522326bab0eeac044ac4fdb929570b90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  moveSpeed: 5
+  moveSpeed: 6
   anim: {fileID: 154629658014696317}
   spriteRenderer: {fileID: 4195069576502474560}
   footstepInterval: 0.35
   fireKey: 257
   projectilePrefab: {fileID: 6632361736362759553, guid: 78715481cd2b6dd4b87871abb58d7c67, type: 3}
-  firePoint: {fileID: 3456558452579545059}
-  firePointOffset: 0.56
-  bodyHeightOffset: 0.5
+  firePoint: {fileID: 5390894687556421082}
+  firePointOffset: 1
+  bodyHeightOffset: 0.9
   projectileSpeed: 8
   projectileDamage: 10
   projectileRange: 10
-  fireCooldown: 0.3
+  fireCooldown: 0.5
   currentAmmo: 0
-  maxHP: 20
+  maxHP: 100
   invincibilityDuration: 0.5
   tradeItemCount: 0
   pickupKey: 102
   dropKey: 103
-  useItemKey: 32
+  useItemKey: 0
   allowMouseUseItem: 1
   pickupRange: 2
   groundItemLayer:
@@ -214,12 +214,10 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: -0.45111644, y: 0.03509462}
-      - {x: -0.39690042, y: -0.5455064}
-      - {x: -0.38410652, y: -0.981701}
-      - {x: 0.40081573, y: -0.95730233}
-      - {x: 0.39162308, y: -0.5185231}
-      - {x: 0.4896689, y: 0.004247904}
+    - - {x: -0.56326854, y: 0.9527012}
+      - {x: -0.4376824, y: 0.025448978}
+      - {x: 0.4213487, y: 0.0072752237}
+      - {x: 0.47947317, y: 0.9830283}
   m_UseDelaunayMesh: 1
 --- !u!95 &154629658014696317
 Animator:
@@ -255,6 +253,7 @@ GameObject:
   - component: {fileID: 286991366370993251}
   - component: {fileID: 8087188134707993204}
   - component: {fileID: 2192032480055132415}
+  - component: {fileID: 7134705001217179281}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -312,7 +311,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 7
+  orthographic size: 7.5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -380,7 +379,31 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!1 &7881884828059840416
+--- !u!114 &7134705001217179281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4730012058775842498}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c88f5cead0c0b2a4eb05b5900433f8d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.2D.Runtime::UnityEngine.Rendering.Universal.PixelPerfectCamera
+  m_ComponentVersion: 1
+  m_AssetsPPU: 12
+  m_RefResolutionX: 320
+  m_RefResolutionY: 180
+  m_CropFrame: 0
+  m_GridSnapping: 0
+  m_FilterMode: 0
+  m_UpscaleRT: 0
+  m_PixelSnapping: 0
+  m_CropFrameX: 0
+  m_CropFrameY: 0
+  m_StretchFill: 0
+--- !u!1 &7083475872538124367
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -388,7 +411,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3456558452579545059}
+  - component: {fileID: 5390894687556421082}
   m_Layer: 0
   m_Name: Fire point
   m_TagString: Untagged
@@ -396,16 +419,16 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3456558452579545059
+--- !u!4 &5390894687556421082
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7881884828059840416}
+  m_GameObject: {fileID: 7083475872538124367}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.74, y: 0, z: 0}
+  m_LocalPosition: {x: -0.029, y: 1.015, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

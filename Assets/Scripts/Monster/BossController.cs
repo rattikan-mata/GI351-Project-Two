@@ -13,6 +13,14 @@ public class BossController : Monster
     [Header("Exit Portal")]
     [Tooltip("ประตูวาร์ปที่จะปรากฏขึ้นเมื่อบอสตัวนี้ตาย")]
     [SerializeField] private GameObject exitPortal;
+
+    [Header("Boss Sound Effects")]
+    [Tooltip("ใส่ชื่อ ID เสียงตอนพุ่ง (Dash/Crazy Dash)")]
+    public string sfxDash = "boss_dash";
+    [Tooltip("ใส่ชื่อ ID เสียงตอนยิงกระสุน")]
+    public string sfxShoot = "boss_shoot";
+    [Tooltip("ใส่ชื่อ ID เสียงตอนกระแทกพื้น หรือชนกำแพง")]
+    public string sfxSlam = "boss_slam";
     #endregion
 
     #region Boss Proximity & Intro Shake
@@ -186,7 +194,7 @@ public class BossController : Monster
     #region Damage & Death
     public override void TakeDamage(int amount)
     {
-        base.TakeDamage(amount); 
+        base.TakeDamage(amount);
         if (UIBossHealthBar.Instance != null)
         {
             UIBossHealthBar.Instance.OnBossTakeDamage(this);
@@ -249,7 +257,7 @@ public class BossController : Monster
         {
             case BossSkill.Dash:
                 SpawnAreaIndicator(transform.position, dashAttackRange, dashIndicatorColor, warningDuration + dashDuration + 0.3f);
-                AudioManager.Instance?.PlaySFX("boss_dash");
+                AudioManager.Instance?.PlaySFX(sfxDash);
                 yield return StartCoroutine(DashAttackRoutine());
                 break;
             case BossSkill.ProjectileBarrage:
@@ -292,7 +300,7 @@ public class BossController : Monster
         yield return StartCoroutine(TelegraphFlash(projectileTelegraphColor, projectileTelegraphDuration, projectileBlinkInterval));
         if (isDead || isStunned) yield break;
 
-        AudioManager.Instance?.PlaySFX("boss_shoot");
+        AudioManager.Instance?.PlaySFX(sfxShoot);
         for (int i = 0; i < count; i++)
         {
             GameObject projObj = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
@@ -326,7 +334,7 @@ public class BossController : Monster
 
         if (isDead || isStunned) yield break;
 
-        AudioManager.Instance?.PlaySFX("boss_slam");
+        AudioManager.Instance?.PlaySFX(sfxSlam);
         if (slamEffectPrefab != null)
         {
             GameObject fx = Instantiate(slamEffectPrefab, targetPos, Quaternion.identity);
@@ -355,7 +363,9 @@ public class BossController : Monster
         if (isDead || isStunned) yield break;
 
         Vector2 dashDir = ((Vector2)playerTransform.position - (Vector2)transform.position).normalized;
-        AudioManager.Instance?.PlaySFX("monster_dash"); 
+
+        // <--- เพิ่มตรงนี้ (เสียงตอนพุ่ง) --->
+        AudioManager.Instance?.PlaySFX("boss_dash");
 
         float elapsed = 0f;
         bool hitObstacle = false;
@@ -365,11 +375,25 @@ public class BossController : Monster
             rb.linearVelocity = dashDir * crazyDashSpeed;
             elapsed += Time.fixedDeltaTime;
 
+            // --- เพิ่มการเช็กดาเมจตอนวิ่งชนผู้เล่นระหว่างทางตรงนี้ ---
+            Collider2D[] runHits = Physics2D.OverlapCircleAll(transform.position, 1.2f);
+            foreach (var h in runHits)
+            {
+                if (h.CompareTag("Player") && h.TryGetComponent<PlayerController>(out var player))
+                {
+                    player.TakeDamage(crazyDashImpactDamage);
+                    player.ApplyKnockback(dashDir, 8f);
+                    hitObstacle = true; // ชนผู้เล่นแล้วให้ถือว่าหยุดพุ่งด้วย (หรือจะปล่อยให้วิ่งต่อก็ได้)
+                    break;
+                }
+            }
+            // ----------------------------------------------------
+
             RaycastHit2D hit = Physics2D.Raycast(transform.position, dashDir, 1f, LayerMask.GetMask("Default", "Wall", "Obstacle"));
             if (hit.collider != null && !hit.collider.CompareTag("Player") && !hit.collider.isTrigger)
             {
                 hitObstacle = true;
-                break; 
+                break;
             }
             yield return new WaitForFixedUpdate();
         }
@@ -378,8 +402,10 @@ public class BossController : Monster
 
         if (hitObstacle && !isDead)
         {
-            AudioManager.Instance?.PlaySFX("boss_slam"); 
-            DrawDebugCircle(transform.position, 2.5f, Color.red, 1f); 
+            // <--- เพิ่มตรงนี้ (เสียงตอนชนกำแพงตู้ม) --->
+            AudioManager.Instance?.PlaySFX("boss_slam");
+
+            DrawDebugCircle(transform.position, 2.5f, Color.red, 1f);
 
             Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, 2.5f);
             foreach (var h in hits)
@@ -409,7 +435,9 @@ public class BossController : Monster
 
             if (isDead || isStunned) break;
 
+            // <--- เพิ่มตรงนี้ (เสียงตอนยิงกระสุนแต่ละนัด) --->
             AudioManager.Instance?.PlaySFX("boss_shoot");
+
             GameObject projObj = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
             if (projObj.TryGetComponent<Projectile>(out var projectile))
             {

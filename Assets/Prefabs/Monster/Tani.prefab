@@ -231,18 +231,21 @@ MonoBehaviour:
   worldItemPrefab: {fileID: 0}
   dropTable: []
   dropItemPrefab: {fileID: 0}
-  contactDamage: 10
+  contactDamage: 15
   attackCooldown: 1
   attackKnockbackForce: 5
   dashAttackRange: 3
   dashSpeed: 12
   dashDuration: 0.25
   dashRecoveryTime: 3
-  warningColor: {r: 0, g: 1, b: 1, a: 1}
+  warningColor: {r: 1, g: 0, b: 0.05270505, a: 1}
   warningDuration: 1.5
   blinkInterval: 0.1
   bossName: Tani
   exitPortal: {fileID: 0}
+  sfxDash: boss_dash
+  sfxShoot: boss_shoot
+  sfxSlam: boss_slam
   bossUIRadius: 15
   encounterShakeDuration: 3
   encounterShakeMagnitude: 0.08
@@ -260,11 +263,11 @@ MonoBehaviour:
   projectilePrefab: {fileID: 2270187744293289748, guid: 7ed5cbfbf43b8704f88eee6b3ee5c2e6, type: 3}
   projectileCount: 4
   projectileArcAngle: 90
-  projectileSpeed: 10
-  projectileDamage: 8
-  projectileRange: 10
+  projectileSpeed: 14
+  projectileDamage: 12
+  projectileRange: 15
   projectileKnockbackForce: 4
-  projectileTelegraphColor: {r: 0, g: 0.54531336, b: 1, a: 0.22745098}
+  projectileTelegraphColor: {r: 1, g: 0, b: 0.009498596, a: 0.22745098}
   projectileTelegraphDuration: 1.25
   projectileBlinkInterval: 0.1
   slamSkillEnabled: 1
@@ -272,7 +275,7 @@ MonoBehaviour:
   slamChargeSpeed: 18
   slamChargeDuration: 0.5
   slamRadius: 4
-  slamDamage: 10
+  slamDamage: 15
   slamKnockbackForce: 12
   slamTelegraphColor: {r: 1, g: 0, b: 0, a: 0.4745098}
   slamTelegraphDuration: 1.1

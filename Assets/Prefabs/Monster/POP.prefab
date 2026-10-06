@@ -240,6 +240,9 @@ MonoBehaviour:
   blinkInterval: 0.1
   bossName: Pop
   exitPortal: {fileID: 0}
+  sfxDash: boss_dash
+  sfxShoot: boss_shoot
+  sfxSlam: boss_slam
   bossUIRadius: 15
   encounterShakeDuration: 3
   encounterShakeMagnitude: 0.08
@@ -250,10 +253,10 @@ MonoBehaviour:
   slamIndicatorColor: {r: 1, g: 0, b: 0, a: 0.5}
   lineIndicatorPrefab: {fileID: 7966542724414560600, guid: dc24a69a454278845a2ea00d6d9ad031, type: 3}
   lineIndicatorWidth: 0.3
-  dashSkillEnabled: 1
+  dashSkillEnabled: 0
   dashWeight: 3
   projectileSkillEnabled: 0
-  projectileWeight: 2
+  projectileWeight: 1
   projectilePrefab: {fileID: 2270187744293289748, guid: 7ed5cbfbf43b8704f88eee6b3ee5c2e6, type: 3}
   projectileCount: 4
   projectileArcAngle: 90
@@ -269,7 +272,7 @@ MonoBehaviour:
   slamChargeSpeed: 18
   slamChargeDuration: 0.5
   slamRadius: 4
-  slamDamage: 10
+  slamDamage: 30
   slamKnockbackForce: 12
   slamTelegraphColor: {r: 1, g: 0, b: 0, a: 0.4745098}
   slamTelegraphDuration: 1.1
@@ -285,5 +288,5 @@ MonoBehaviour:
   crazyDashSelfStunDuration: 2
   trackingShootEnabled: 1
   trackingShootWeight: 1
-  trackingShootCount: 3
-  trackingShootDelay: 0.4
+  trackingShootCount: 6
+  trackingShootDelay: 0.3
