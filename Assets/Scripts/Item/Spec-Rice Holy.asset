@@ -42,8 +42,8 @@ MonoBehaviour:
   arcProjectilePrefab: {fileID: 2270187744293289748, guid: d03d17b23f63e704a9d50db6becf01df, type: 3}
   arcProjectileSpeed: 10
   arcAngle: 45
-  pelletCount: 5
-  arcRange: 6
+  pelletCount: 3
+  arcRange: 5
   arcWavesPerSecond: 2
   arcCastDuration: 2
   arcLockFacing: 1

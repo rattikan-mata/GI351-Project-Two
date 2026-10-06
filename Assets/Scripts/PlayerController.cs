@@ -245,6 +245,15 @@ public class PlayerController : MonoBehaviour
         bool pressed = Input.GetKeyDown(useItemKey) || (allowMouseUseItem && Input.GetMouseButtonDown(0));
         if (!pressed) return;
 
+        // เพิ่มบล็อกนี้เข้าไปเพื่อดักจับไม่ให้คลิกทะลุ UI (เช่น ตอนกดปุ่ม Resume หรือปุ่มอื่นๆ บนหน้าจอ)
+        if (Input.GetMouseButtonDown(0) && UnityEngine.EventSystems.EventSystem.current != null)
+        {
+            if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+            {
+                return; // ถ้าเมาส์ชี้อยู่บน UI ให้หยุดการทำงานฟังก์ชันนี้ทันที ไอเทมจะไม่ลั่น
+            }
+        }
+
         InventorySlotData activeSlot = inventorySlots[activeSlotIndex];
         ItemData item = activeSlot.item;
         if (item == null) return; // ช่องว่าง ไม่มีอะไรให้ใช้
