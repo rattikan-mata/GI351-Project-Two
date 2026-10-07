@@ -4915,7 +4915,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -1281301236709249638, guid: 63485e0051027024894791c63a96f07a, type: 3}
       propertyPath: maxHP
-      value: 250
+      value: 300
       objectReference: {fileID: 0}
     - target: {fileID: -1281301236709249638, guid: 63485e0051027024894791c63a96f07a, type: 3}
       propertyPath: dropChance
@@ -12247,6 +12247,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1937643720}
     m_Modifications:
+    - target: {fileID: -1281301236709249638, guid: 76889eda1f275374e9f9d8fe5353aeab, type: 3}
+      propertyPath: maxHP
+      value: 250
+      objectReference: {fileID: 0}
     - target: {fileID: -1281301236709249638, guid: 76889eda1f275374e9f9d8fe5353aeab, type: 3}
       propertyPath: bossName
       value: Tanee

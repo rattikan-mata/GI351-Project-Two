@@ -211,6 +211,12 @@ public class BossController : Monster
         {
             UIBossHealthBar.Instance.OnBossTakeDamage(this);
         }
+
+        // เพิ่มการเช็ค: สั่งให้บอสตายทันทีเมื่อเลือดเหลือน้อยกว่าหรือเท่ากับ 10%
+        if (!isDead && CurrentHP <= (MaxHP * 0.1f))
+        {
+            Die();
+        }
     }
 
     public override void Die()
