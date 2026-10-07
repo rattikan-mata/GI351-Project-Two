@@ -126,7 +126,13 @@ public class EndingManager : MonoBehaviour
     public void OnExitButtonClicked()
     {
         AudioManager.Instance?.PlaySFX("button_click");
-        
+
+        // เคลียร์ค่ากุญแจและสถานะเนื้อเรื่องก่อนโหลดฉากใหม่
+        if (StoryManager.Instance != null)
+        {
+            StoryManager.Instance.ResetStory();
+        }
+
         // โหลดกลับไปยังหน้า Main Menu
         SceneManager.LoadScene(mainMenuSceneName);
     }

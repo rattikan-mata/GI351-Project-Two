@@ -4,7 +4,6 @@ public class StoryManager : MonoBehaviour
 {
     public static StoryManager Instance { get; private set; }
 
-    // ตัวแปรจำสถานะต่างๆ
     public bool isTaneeDefeated = false;
     public bool hasHouseKey = false;
 
@@ -16,6 +15,13 @@ public class StoryManager : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject); // ทำให้ตัวจำสถานะนี้อยู่ตลอดไป ไม่หายตอนเปลี่ยนฉาก
+        DontDestroyOnLoad(gameObject);
+    }
+
+    // เพิ่มฟังก์ชันนี้เพื่อเคลียร์สถานะทั้งหมดให้กลับเป็นค่าเริ่มต้น
+    public void ResetStory()
+    {
+        isTaneeDefeated = false;
+        hasHouseKey = false;
     }
 }
