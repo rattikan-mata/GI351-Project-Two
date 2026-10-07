@@ -367,7 +367,7 @@ MonoBehaviour:
   stunDuration: 1
   knockbackDuration: 0.15
   dropChance: 0.1
-  worldItemPrefab: {fileID: 7194281834610975454, guid: f93c9abf2450f2d458eb57dcccc24b6b, type: 3}
+  worldItemPrefab: {fileID: 2492133980344340253, guid: 39574c2534646fa4c8cc51a3b1b06bc2, type: 3}
   dropTable:
   - item: {fileID: 11400000, guid: f5cb365cbbb268446befdbf19528d9a7, type: 2}
     weight: 1

@@ -228,7 +228,7 @@ MonoBehaviour:
   stunDuration: 1.5
   knockbackDuration: 0.15
   dropChance: 0.3
-  worldItemPrefab: {fileID: 0}
+  worldItemPrefab: {fileID: 2492133980344340253, guid: 39574c2534646fa4c8cc51a3b1b06bc2, type: 3}
   dropTable: []
   dropItemPrefab: {fileID: 0}
   contactDamage: 15
@@ -289,6 +289,8 @@ MonoBehaviour:
   crazyDashMaxTime: 3
   crazyDashImpactDamage: 15
   crazyDashSelfStunDuration: 2
+  dashProjectilesPerSecond: 5
+  dashProjectileSpreadAngle: 30
   trackingShootEnabled: 0
   trackingShootWeight: 1
   trackingShootCount: 3

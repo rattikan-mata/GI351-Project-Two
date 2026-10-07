@@ -12155,9 +12155,13 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1341744342}
     - target: {fileID: -1281301236709249638, guid: 76889eda1f275374e9f9d8fe5353aeab, type: 3}
-      propertyPath: worldItemPrefab
+      propertyPath: dropItemPrefab
       value: 
       objectReference: {fileID: 5533808792794430445, guid: 5ca50c28f7c2de94eaf8ab55a0d38357, type: 3}
+    - target: {fileID: -1281301236709249638, guid: 76889eda1f275374e9f9d8fe5353aeab, type: 3}
+      propertyPath: worldItemPrefab
+      value: 
+      objectReference: {fileID: 2492133980344340253, guid: 39574c2534646fa4c8cc51a3b1b06bc2, type: 3}
     - target: {fileID: -1281301236709249638, guid: 76889eda1f275374e9f9d8fe5353aeab, type: 3}
       propertyPath: dropTable.Array.size
       value: 1
@@ -12166,6 +12170,10 @@ PrefabInstance:
       propertyPath: dropTable.Array.data[0].item
       value: 
       objectReference: {fileID: 11400000, guid: 4cffceb7053126c40a5ad74ed42aa99e, type: 2}
+    - target: {fileID: -1281301236709249638, guid: 76889eda1f275374e9f9d8fe5353aeab, type: 3}
+      propertyPath: dropTable.Array.data[0].weight
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3288230206911401485, guid: 76889eda1f275374e9f9d8fe5353aeab, type: 3}
       propertyPath: m_Name
       value: Tanee
@@ -12425,7 +12433,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EndingDoor
   endingSceneName: Endding
-  errorMessage: "\u0E1B\u0E23\u0E30\u0E15\u0E39\u0E25\u0E47\u0E2D\u0E04\u0E2D\u0E22\u0E39\u0E48! "
+  errorMessage: "\u0E1B\u0E23\u0E30\u0E15\u0E39\u0E25\u0E47\u0E2D\u0E04\u0E2D\u0E22\u0E39\u0E48!
+    \u0E01\u0E38\u0E0D\u0E41\u0E08\u0E43\u0E19\u0E2D\u0E22\u0E39\u0E48\u0E04\u0E2D\u0E01\u0E27\u0E31\u0E27 "
   messageDuration: 2
   successMessage: 
   successDuration: 1.5
@@ -38978,7 +38987,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalConditionalWarp
   destination: {fileID: 664868492}
   requiredCondition: 1
-  errorMessage: "\u0E16\u0E39\u0E01\u0E23\u0E32\u0E01\u0E44\u0E21\u0E49\u0E41\u0E21\u0E48\u0E15\u0E32\u0E19\u0E35\u0E2B\u0E49\u0E32\u0E21\u0E40\u0E02\u0E49\u0E32!"
+  errorMessage: "\u0E16\u0E39\u0E01\u0E23\u0E32\u0E01\u0E44\u0E21\u0E49\u0E02\u0E31\u0E14\u0E02\u0E27\u0E32\u0E07
+    \u0E1B\u0E23\u0E32\u0E1A\u0E15\u0E32\u0E19\u0E35\u0E01\u0E48\u0E2D\u0E19"
   successMessage: "\u0E15\u0E32\u0E22 !"
 --- !u!114 &1098889142
 MonoBehaviour:
@@ -143973,6 +143983,37 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!1 &1411596065
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1411596066}
+  m_Layer: 0
+  m_Name: Light
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1411596066
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1411596065}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 15.73734, y: 19.55311, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1412782570
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -155231,6 +155272,10 @@ PrefabInstance:
       propertyPath: dropChance
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4141860761304923094, guid: c9907f14e54a2fc47bb22cfd03ea6508, type: 3}
+      propertyPath: worldItemPrefab
+      value: 
+      objectReference: {fileID: 2492133980344340253, guid: 39574c2534646fa4c8cc51a3b1b06bc2, type: 3}
     - target: {fileID: 4345093713609307381, guid: c9907f14e54a2fc47bb22cfd03ea6508, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -216925,6 +216970,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6802481599056181250, guid: 003637d8744daad4a956741f8e1d862b, type: 3}
+      propertyPath: worldItemPrefab
+      value: 
+      objectReference: {fileID: 2492133980344340253, guid: 39574c2534646fa4c8cc51a3b1b06bc2, type: 3}
+    - target: {fileID: 6802481599056181250, guid: 003637d8744daad4a956741f8e1d862b, type: 3}
       propertyPath: bodyHeightOffset
       value: 0.9
       objectReference: {fileID: 0}
@@ -217074,3 +217123,4 @@ SceneRoots:
   - {fileID: 634826523}
   - {fileID: 582953721}
   - {fileID: 1194524589}
+  - {fileID: 1411596066}
